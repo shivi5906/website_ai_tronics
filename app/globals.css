@@ -554,3 +554,33 @@
 .terminal-input:focus {
   border-bottom-color: var(--cream);
 }
+
+/* Gallery Row Scroll */
+.gallery-row {
+  display: flex;
+  width: max-content;
+  will-change: transform;
+}
+
+.gallery-row-reverse {
+  display: flex;
+  width: max-content;
+  will-change: transform;
+  flex-direction: row-reverse;
+}
+
+/* Glitch Text */
+.glitch-text {
+  position: relative;
+}
+
+/* Neon Cyan and Magenta */
+:root {
+  --neon-cyan: #00ffff;
+  --neon-magenta: #ff0040;
+}
+
+/* Smooth Scroll Behavior */
+.scroll-smooth {
+  scroll-behavior: smooth;
+}

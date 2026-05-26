@@ -56,14 +56,54 @@ const generatePhotos = (): Photo[] => {
 }
 
 export default function LandingHero({ onEnter }: { onEnter: () => void }) {
-  const [photos] = useState<Photo[]>(generatePhotos)
+  const [photos, setPhotos] = useState<Photo[]>(generatePhotos)
   const [isReady, setIsReady] = useState(false)
   const [hoveredPhoto, setHoveredPhoto] = useState<number | null>(null)
+  const [isDragging, setIsDragging] = useState(false)
+  const [dragStart, setDragStart] = useState({ x: 0, y: 0 })
+  const [photoOffsets, setPhotoOffsets] = useState<{[key: number]: {x: number, y: number}}>({})
 
   useEffect(() => {
     const timer = setTimeout(() => setIsReady(true), 100)
     return () => clearTimeout(timer)
   }, [])
+
+  const handlePhotoMouseDown = (photoId: number) => (e: React.MouseEvent) => {
+    setIsDragging(true)
+    setDragStart({ x: e.clientX, y: e.clientY })
+  }
+
+  useEffect(() => {
+    if (!isDragging) return
+
+    const handleMouseMove = (e: MouseEvent) => {
+      const deltaX = e.clientX - dragStart.x
+      const deltaY = e.clientY - dragStart.y
+
+      if (hoveredPhoto !== null) {
+        setPhotoOffsets(prev => ({
+          ...prev,
+          [hoveredPhoto]: {
+            x: (prev[hoveredPhoto]?.x || 0) + deltaX * 0.5,
+            y: (prev[hoveredPhoto]?.y || 0) + deltaY * 0.5,
+          }
+        }))
+        setDragStart({ x: e.clientX, y: e.clientY })
+      }
+    }
+
+    const handleMouseUp = () => {
+      setIsDragging(false)
+    }
+
+    document.addEventListener('mousemove', handleMouseMove)
+    document.addEventListener('mouseup', handleMouseUp)
+
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove)
+      document.removeEventListener('mouseup', handleMouseUp)
+    }
+  }, [isDragging, dragStart, hoveredPhoto])
 
   return (
     <div className="relative min-h-screen w-full overflow-hidden bg-[#0a0a0a]">
@@ -72,43 +112,54 @@ export default function LandingHero({ onEnter }: { onEnter: () => void }) {
       
       {/* Scattered Photos Background */}
       <div className="absolute inset-0">
-        {photos.map((photo) => (
-          <div
-            key={photo.id}
-            className={`gallery-photo float-photo photo-rgb transition-all duration-700 ${
-              isReady ? 'opacity-100' : 'opacity-0'
-            }`}
-            style={{
-              left: `${photo.x}%`,
-              top: `${photo.y}%`,
-              width: photo.width,
-              height: photo.height,
-              transform: `rotate(${photo.rotate}deg) scale(${hoveredPhoto === photo.id ? 1.1 : 1})`,
-              transitionDelay: `${photo.delay * 0.3}s`,
-              zIndex: hoveredPhoto === photo.id ? 50 : photo.id,
-              ['--float-delay' as string]: `${photo.delay}s`,
-              ['--rotate' as string]: `${photo.rotate}deg`,
-            }}
-            onMouseEnter={() => setHoveredPhoto(photo.id)}
-            onMouseLeave={() => setHoveredPhoto(null)}
-          >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={photo.src}
-              alt={photo.alt}
-              className="w-full h-full object-cover"
-              style={{ filter: 'contrast(1.1) brightness(0.9)' }}
-            />
-            {/* Photo label overlay */}
-            <div className={`absolute inset-0 flex items-end justify-start p-3 bg-gradient-to-t from-black/70 to-transparent transition-opacity duration-300 ${
-              hoveredPhoto === photo.id ? 'opacity-100' : 'opacity-0'
-            }`}>
-              <span className="font-mono text-xs text-[#f5f5dc] tracking-wider">
-                {photo.alt}
-              </span>
+        {photos.map((photo) => {
+          const offset = photoOffsets[photo.id] || { x: 0, y: 0 }
+          return (
+            <div
+              key={photo.id}
+              className={`gallery-photo float-photo photo-rgb transition-all ${
+                isDragging && hoveredPhoto === photo.id ? '' : 'duration-700'
+              } ${isReady ? 'opacity-100' : 'opacity-0'} ${
+                hoveredPhoto === photo.id ? 'cursor-grab active:cursor-grabbing' : 'cursor-pointer'
+              }`}
+              style={{
+                left: `${photo.x}%`,
+                top: `${photo.y}%`,
+                width: photo.width,
+                height: photo.height,
+                transform: `rotate(${photo.rotate}deg) scale(${hoveredPhoto === photo.id ? 1.1 : 1}) translate(${offset.x}px, ${offset.y}px)`,
+                transitionDelay: isDragging ? '0s' : `${photo.delay * 0.3}s`,
+                zIndex: hoveredPhoto === photo.id ? 50 : photo.id,
+                ['--float-delay' as string]: `${photo.delay}s`,
+                ['--rotate' as string]: `${photo.rotate}deg`,
+              }}
+              onMouseEnter={() => setHoveredPhoto(photo.id)}
+              onMouseLeave={() => {
+                if (!isDragging) {
+                  setHoveredPhoto(null)
+                }
+              }}
+              onMouseDown={handlePhotoMouseDown(photo.id)}
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={photo.src}
+                alt={photo.alt}
+                className="w-full h-full object-cover select-none"
+                style={{ filter: 'contrast(1.1) brightness(0.9)' }}
+                draggable={false}
+              />
+              {/* Photo label overlay */}
+              <div className={`absolute inset-0 flex items-end justify-start p-3 bg-gradient-to-t from-black/70 to-transparent transition-opacity duration-300 ${
+                hoveredPhoto === photo.id ? 'opacity-100' : 'opacity-0'
+              }`}>
+                <span className="font-mono text-xs text-[#f5f5dc] tracking-wider">
+                  {photo.alt}
+                </span>
+              </div>
             </div>
-          </div>
-        ))}
+          )
+        })}
       </div>
 
       {/* Center Content */}
