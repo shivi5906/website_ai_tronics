@@ -16,6 +16,7 @@ const sections: Section[] = [
   { id: 'events', label: 'ARCHIVES', sublabel: 'Events & Memories', number: '03' },
   { id: 'vibe', label: 'NOW PLAYING', sublabel: 'Set Your Frequency', number: '04' },
   { id: 'contact', label: 'TRANSMIT', sublabel: 'Get In Touch', number: '05' },
+  { id: 'infinite-gallery', label: 'INFINITE', sublabel: 'Infinite Archive Experience', number: '06' },
 ]
 
 interface SectionMenuProps {

@@ -584,3 +584,73 @@
 .scroll-smooth {
   scroll-behavior: smooth;
 }
+
+/* Infinite Gallery Styles */
+#infinite-gallery {
+  perspective: 1200px;
+  background: linear-gradient(180deg, rgba(0,0,0,1) 0%, rgba(10,10,10,1) 50%, rgba(0,0,0,1) 100%);
+}
+
+#infinite-gallery .glitch-rgb {
+  position: relative;
+  display: inline-block;
+}
+
+#infinite-gallery .glitch-rgb::before,
+#infinite-gallery .glitch-rgb::after {
+  content: attr(data-text);
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+}
+
+#infinite-gallery .glitch-rgb::before {
+  animation: glitch-rgb-animation 0.3s infinite;
+  color: #00ffff;
+  z-index: -1;
+}
+
+#infinite-gallery .glitch-rgb::after {
+  animation: glitch-rgb-animation 0.3s infinite reverse;
+  color: #ff0040;
+  z-index: -2;
+}
+
+@keyframes glitch-rgb-animation {
+  0% {
+    clip-path: inset(40% 0 61% 0);
+    transform: translate(-2px, -2px);
+  }
+  20% {
+    clip-path: inset(92% 0 1% 0);
+    transform: translate(2px, 2px);
+  }
+  40% {
+    clip-path: inset(43% 0 1% 0);
+    transform: translate(-2px, 2px);
+  }
+  60% {
+    clip-path: inset(25% 0 58% 0);
+    transform: translate(2px, -2px);
+  }
+  80% {
+    clip-path: inset(54% 0 7% 0);
+    transform: translate(-2px, -2px);
+  }
+  100% {
+    clip-path: inset(58% 0 43% 0);
+    transform: translate(2px, 2px);
+  }
+}
+
+/* Photo Grid Depth Effect */
+#infinite-gallery img {
+  will-change: transform, opacity, filter;
+  backface-visibility: hidden;
+}
+
+#infinite-gallery .group {
+  will-change: transform, opacity;
+}

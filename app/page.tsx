@@ -10,8 +10,9 @@ import AboutSection from '@/components/about-section'
 import EventsSection from '@/components/events-section'
 import VibeSection from '@/components/vibe-section'
 import ContactSection from '@/components/contact-section'
+import InfiniteGallerySection from '@/components/infinite-gallery-section'
 
-type ViewState = 'landing' | 'menu' | 'team' | 'about' | 'events' | 'vibe' | 'contact'
+type ViewState = 'landing' | 'menu' | 'team' | 'about' | 'events' | 'vibe' | 'contact' | 'infinite-gallery'
 
 export default function Home() {
   const [isLoaded, setIsLoaded] = useState(false)
@@ -52,6 +53,8 @@ export default function Home() {
         return <VibeSection onBack={handleBackToMenu} />
       case 'contact':
         return <ContactSection onBack={handleBackToMenu} />
+      case 'infinite-gallery':
+        return <InfiniteGallerySection />
       default:
         return <LandingHero onEnter={handleEnterSociety} />
     }
