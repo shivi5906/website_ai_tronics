@@ -84,15 +84,14 @@ export default function SectionMenu({ isOpen, onClose, onSelectSection, currentS
       
       {/* Top fixed header bar */}
       <div className="fixed top-0 left-0 right-0 z-[110] flex items-center justify-between px-6 py-6 md:px-12 md:py-8 bg-gradient-to-b from-[#0a0a0a] via-[#0a0a0a]/90 to-transparent pointer-events-none">
-        {/* Logo */}
-        <div className="pointer-events-auto">
-          <span 
-            className="text-xl md:text-2xl text-[#f5f5dc] tracking-[0.2em]"
-            style={{ fontFamily: 'Bebas Neue, Impact, sans-serif' }}
-          >
-            AI-TRONICS
-          </span>
-        </div>
+        {/* Logo button linked back to landing page */}
+        <button
+          onClick={onClose}
+          className="pointer-events-auto text-xl md:text-2xl text-[#f5f5dc] tracking-[0.2em] hover:text-[#a8a29e] transition-colors cursor-pointer bg-transparent border-none p-0"
+          style={{ fontFamily: 'Bebas Neue, Impact, sans-serif' }}
+        >
+          AI-TRONICS
+        </button>
         
         {/* Close button */}
         <button

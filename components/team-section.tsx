@@ -49,9 +49,10 @@ const teamMembers: TeamMember[] = [
 
 interface TeamSectionProps {
   onBack: () => void
+  onHome?: () => void
 }
 
-export default function TeamSection({ onBack }: TeamSectionProps) {
+export default function TeamSection({ onBack, onHome }: TeamSectionProps) {
   const sectionRef = useRef<HTMLElement>(null)
   const [isVisible, setIsVisible] = useState(false)
 
@@ -78,12 +79,13 @@ export default function TeamSection({ onBack }: TeamSectionProps) {
 
       {/* Header */}
       <div className="fixed top-8 right-8 z-50 hidden md:block">
-        <span 
-          className="text-2xl text-[#f5f5dc] tracking-[0.1em]"
+        <button
+          onClick={onHome}
+          className="text-2xl text-[#f5f5dc] tracking-[0.1em] hover:text-[#a8a29e] transition-colors cursor-pointer bg-transparent border-none p-0"
           style={{ fontFamily: 'Bebas Neue, Impact, sans-serif' }}
         >
           AI-TRONICS
-        </span>
+        </button>
       </div>
 
       <div className="pt-32 pb-24 px-4 md:px-8">
