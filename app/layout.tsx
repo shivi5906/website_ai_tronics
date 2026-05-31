@@ -37,6 +37,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable} ${bebasNeue.variable} bg-[#0a0a0a]`}>
+      <head>
+        <link rel="preload" href="/audio/industry_baby.mp3" as="audio" type="audio/mpeg" />
+      </head>
       <body className="font-sans antialiased bg-[#0a0a0a] text-[#f5f5dc] overflow-x-hidden">
         {children}
       </body>
