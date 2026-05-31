@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Preloader from '@/components/preloader'
 import CustomCursor from '@/components/custom-cursor'
 import LandingHero from '@/components/landing-hero'
@@ -17,6 +17,55 @@ type ViewState = 'landing' | 'menu' | 'team' | 'about' | 'events' | 'vibe' | 'co
 export default function Home() {
   const [isLoaded, setIsLoaded] = useState(false)
   const [currentView, setCurrentView] = useState<ViewState>('landing')
+  const [isMuted, setIsMuted] = useState(false)
+  // Default directly to local public asset path
+  const [audioSrc, setAudioSrc] = useState('/audio/industry_baby.mp3')
+  const audioRef = useRef<HTMLAudioElement | null>(null)
+
+  // Sync mute/play states with the background audio element
+  useEffect(() => {
+    if (audioRef.current) {
+      if (isMuted) {
+        audioRef.current.pause()
+      } else {
+        if (isLoaded) {
+          audioRef.current.play().catch(() => {
+            // Autoplay blocked by browser policy
+          })
+        }
+      }
+    }
+  }, [isMuted, isLoaded])
+
+  // Handle 2-second audio autoplay trigger after loading completes
+  useEffect(() => {
+    if (!isLoaded) return
+
+    const playAudio = () => {
+      if (audioRef.current) {
+        audioRef.current.play().catch(() => {
+          // Autoplay blocked by browser policy
+        })
+      }
+    }
+
+    const timer = setTimeout(() => {
+      playAudio()
+
+      // Set fallback click interaction handlers in case browser blocks autoplay
+      const handleUserInteract = () => {
+        playAudio()
+        window.removeEventListener('click', handleUserInteract)
+        window.removeEventListener('touchstart', handleUserInteract)
+        window.removeEventListener('keydown', handleUserInteract)
+      }
+      window.addEventListener('click', handleUserInteract)
+      window.addEventListener('touchstart', handleUserInteract)
+      window.addEventListener('keydown', handleUserInteract)
+    }, 2000)
+
+    return () => clearTimeout(timer)
+  }, [isLoaded])
 
   const handleEnterSociety = () => {
     setCurrentView('infinite-gallery')
@@ -46,6 +95,8 @@ export default function Home() {
               <LandingHero 
                 onEnter={handleEnterSociety} 
                 onScrollDown={() => setCurrentView('menu')} 
+                isMuted={isMuted}
+                onToggleMute={() => setIsMuted(!isMuted)}
               />
             </div>
 
@@ -101,6 +152,22 @@ export default function Home() {
       <main className={`relative z-10 transition-opacity duration-1000 ${isLoaded ? 'opacity-100' : 'opacity-0'}`}>
         {renderCurrentView()}
       </main>
+
+      {/* Global Background Audio Player */}
+      <audio 
+        ref={audioRef}
+        src={audioSrc}
+        onError={() => {
+          // If the local file fails to load (e.g., file not found, named differently, or format error),
+          // instantly fall back to the high-availability online stream seamlessly!
+          if (audioSrc === '/audio/industry_baby.mp3') {
+            console.log("Local industry_baby.mp3 not found or failed to load. Falling back to online stream.");
+            setAudioSrc('https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3');
+          }
+        }}
+        loop
+        preload="auto"
+      />
     </>
   )
 }

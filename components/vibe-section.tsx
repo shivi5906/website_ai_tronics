@@ -73,7 +73,7 @@ export default function VibeSection({ onBack }: VibeSectionProps) {
       </button>
 
       {/* Header */}
-      <div className="fixed top-8 right-8 z-50">
+      <div className="fixed top-8 right-8 z-50 hidden md:block">
         <span 
           className="text-2xl text-[#f5f5dc] tracking-[0.1em]"
           style={{ fontFamily: 'Bebas Neue, Impact, sans-serif' }}

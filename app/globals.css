@@ -39,7 +39,11 @@
 @layer base {
   * {
     @apply border-border;
-    cursor: none !important;
+  }
+  @media (min-width: 768px) {
+    * {
+      cursor: none !important;
+    }
   }
   body {
     @apply bg-background text-foreground;
@@ -646,6 +650,13 @@
   border-radius: 9999px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
   transition: all 0.4s ease;
+  max-width: 90vw;
+  overflow-x: auto;
+  scrollbar-width: none; /* Firefox */
+}
+
+.gallery-nav::-webkit-scrollbar {
+  display: none; /* Safari/Chrome */
 }
 
 .gallery-nav:hover {
@@ -665,6 +676,7 @@
   padding: 0.25rem 0.5rem;
   cursor: none !important;
   transition: color 0.3s ease, text-shadow 0.3s ease;
+  flex-shrink: 0;
 }
 
 .gallery-nav-link:hover,

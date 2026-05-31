@@ -58,10 +58,12 @@ const generatePhotos = (): Photo[] => {
 interface LandingHeroProps {
   onEnter: () => void
   onScrollDown?: () => void
+  isMuted?: boolean
+  onToggleMute?: () => void
 }
 
-export default function LandingHero({ onEnter, onScrollDown }: LandingHeroProps) {
-  const [photos, setPhotos] = useState<Photo[]>(generatePhotos)
+export default function LandingHero({ onEnter, onScrollDown, isMuted = false, onToggleMute }: LandingHeroProps) {
+  const [photos, setPhotos] = useState<Photo[]>([])
   const [isReady, setIsReady] = useState(false)
   const [hoveredPhoto, setHoveredPhoto] = useState<number | null>(null)
   const [isDragging, setIsDragging] = useState(false)
@@ -71,6 +73,7 @@ export default function LandingHero({ onEnter, onScrollDown }: LandingHeroProps)
   const touchStartY = useRef(0)
 
   useEffect(() => {
+    setPhotos(generatePhotos())
     const timer = setTimeout(() => setIsReady(true), 100)
     return () => clearTimeout(timer)
   }, [])
@@ -287,11 +290,22 @@ export default function LandingHero({ onEnter, onScrollDown }: LandingHeroProps)
         </span>
       </div>
 
-      <div className="absolute top-6 right-6 z-50">
-        <span className="font-mono text-xs text-[#6b6b6b] tracking-[0.2em]">
-          SOUND ON
-        </span>
-      </div>
+      <button 
+        onClick={onToggleMute}
+        className="absolute top-6 right-6 z-50 font-mono text-xs tracking-[0.2em] transition-all duration-300 flex items-center gap-2 cursor-pointer p-2 bg-transparent border-none text-[#a8a29e] hover:text-[#f5f5dc]"
+      >
+        {isMuted ? (
+          <>
+            <span className="w-1.5 h-1.5 bg-[#ff0040] rounded-full animate-ping" />
+            SOUND OFF
+          </>
+        ) : (
+          <>
+            <span className="w-1.5 h-1.5 bg-[#00ffff] rounded-full animate-pulse" />
+            SOUND ON
+          </>
+        )}
+      </button>
 
       <div className="absolute bottom-6 left-6 z-50">
         <div className="font-mono text-xs text-[#6b6b6b] leading-relaxed tracking-wider">
