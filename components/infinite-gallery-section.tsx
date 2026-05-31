@@ -1,306 +1,247 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import gsap from 'gsap'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import { GalleryCanvas, GalleryCardConfig } from '@/lib/gallery-canvas'
+import { ArrowDown, ArrowUp, X } from 'lucide-react'
 
-gsap.registerPlugin(ScrollTrigger)
+// Scanned high-quality tech cards configuration
+const GALLERY_CARDS: GalleryCardConfig[] = [
+  { id: '1', imageUrl: 'https://picsum.photos/seed/cyber1/600/400?grayscale', title: 'NEURAL NODE', subtitle: '// DEEP LEARNING MODEL' },
+  { id: '2', imageUrl: 'https://picsum.photos/seed/cyber2/600/400?grayscale', title: 'SYNAPSE NET', subtitle: '// COGNITIVE MESH V2' },
+  { id: '3', imageUrl: 'https://picsum.photos/seed/cyber3/600/400?grayscale', title: 'AUTONOMOUS CORE', subtitle: '// ROBOTICS DRIVE MATRIX' },
+  { id: '4', imageUrl: 'https://picsum.photos/seed/cyber4/600/400?grayscale', title: 'QUANTUM GRID', subtitle: '// CRYPTO HARVESTER' },
+  { id: '5', imageUrl: 'https://picsum.photos/seed/cyber5/600/400?grayscale', title: 'VECTOR PATH', subtitle: '// COMPUTER VISION v4' },
+  { id: '6', imageUrl: 'https://picsum.photos/seed/cyber6/600/400?grayscale', title: 'BIO LINK', subtitle: '// HUMAN-MACHINE FEED' },
+  { id: '7', imageUrl: 'https://picsum.photos/seed/cyber7/600/400?grayscale', title: 'PROTOTYPE X', subtitle: '// KINETIC ACTUATOR' },
+  { id: '8', imageUrl: 'https://picsum.photos/seed/cyber8/600/400?grayscale', title: 'DEPTH MATRIX', subtitle: '// LiDAR CLOUD MAP' },
+  { id: '9', imageUrl: 'https://picsum.photos/seed/cyber9/600/400?grayscale', title: 'COBALT RAY', subtitle: '// TRANSMISSION BEACON' }
+]
 
-interface GalleryPhoto {
-  id: string
-  x: number
-  y: number
-  depth: number
-  src: string
-  alt: string
-  seed: number
+// Navigation items matching website main sections
+const NAV_ITEMS = [
+  { label: 'THE MINDS', id: 'team' },
+  { label: 'THE HUB', id: 'about' },
+  { label: 'ARCHIVES', id: 'events' },
+  { label: 'NOW PLAYING', id: 'vibe' },
+  { label: 'TRANSMIT', id: 'contact' }
+]
+
+interface InfiniteGallerySectionProps {
+  onBack?: () => void
+  onNavigate?: (sectionId: string) => void
 }
 
-const DEPTH_LAYERS = 15
-const PHOTOS_PER_LAYER = 25
-const VIRTUAL_CANVAS_SIZE = 3000
-const PHOTO_SIZE_BASE = 200
-
-// Generate pseudo-random numbers based on seed
-const seededRandom = (seed: number): number => {
-  const x = Math.sin(seed) * 10000
-  return x - Math.floor(x)
-}
-
-// Generate photos across depth layers
-const generatePhotos = (): GalleryPhoto[] => {
-  const photos: GalleryPhoto[] = []
-  let id = 0
-
-  for (let depth = 0; depth < DEPTH_LAYERS; depth++) {
-    const photosAtDepth = PHOTOS_PER_LAYER + Math.floor(depth * 1.5)
-
-    for (let i = 0; i < photosAtDepth; i++) {
-      const seed = depth * 1000 + i
-      const randomX = seededRandom(seed)
-      const randomY = seededRandom(seed + 1)
-      const randomSeed = seededRandom(seed + 2)
-
-      photos.push({
-        id: `photo-${id}`,
-        x: randomX * VIRTUAL_CANVAS_SIZE - VIRTUAL_CANVAS_SIZE / 2,
-        y: randomY * VIRTUAL_CANVAS_SIZE - VIRTUAL_CANVAS_SIZE / 2,
-        depth,
-        src: `https://picsum.photos/seed/${Math.floor(randomSeed * 10000)}/600/400?grayscale`,
-        alt: `Gallery Photo ${id}`,
-        seed: randomSeed,
-      })
-      id++
-    }
-  }
-
-  return photos
-}
-
-export default function InfiniteGallerySection() {
+export default function InfiniteGallerySection({ onBack, onNavigate }: InfiniteGallerySectionProps) {
   const containerRef = useRef<HTMLDivElement>(null)
-  const viewportRef = useRef<HTMLDivElement>(null)
-  const photosRef = useRef<GalleryPhoto[]>(generatePhotos())
+  const canvasContainerRef = useRef<HTMLDivElement>(null)
+  const galleryEngineRef = useRef<GalleryCanvas | null>(null)
   
-  const [zoom, setZoom] = useState(0) // 0-1 scale, higher = zoomed out
-  const [cameraX, setCameraX] = useState(0)
-  const [cameraY, setCameraY] = useState(0)
-  const [isDragging, setIsDragging] = useState(false)
-  const [hoveredPhoto, setHoveredPhoto] = useState<string | null>(null)
-  
-  // Drag state
-  const dragStateRef = useRef({ startX: 0, startY: 0, startCamX: 0, startCamY: 0, isDragging: false })
-  
-  // Momentum drag
-  const momentumRef = useRef({ vx: 0, vy: 0 })
+  const [isLocked, setIsLocked] = useState(false)
+  const [hasScrolledInit, setHasScrolledInit] = useState(false)
 
-  // Smooth zoom easing
+  // Initialize the gallery engine
   useEffect(() => {
-    const handleWheel = (e: WheelEvent) => {
-      const section = containerRef.current
-      if (!section) return
+    if (canvasContainerRef.current && isLocked) {
+      const engine = new GalleryCanvas({
+        container: canvasContainerRef.current,
+        cards: GALLERY_CARDS,
+        onExit: () => handleUnlock(),
+        onSelect: (card) => console.log('Selected card:', card)
+      })
+      
+      galleryEngineRef.current = engine
+      engine.init()
+      engine.show()
 
-      // Check if user is scrolling within this section
-      const rect = section.getBoundingClientRect()
-      if (rect.top > window.innerHeight || rect.bottom < 0) return
-
-      e.preventDefault()
-
-      const zoomDelta = (e.deltaY > 0 ? 1 : -1) * 0.02
-      setZoom(prev => Math.max(0, Math.min(1, prev + zoomDelta)))
+      return () => {
+        engine.destroy()
+        galleryEngineRef.current = null
+      }
     }
+  }, [isLocked])
+
+  // Scroll Trigger handling for transition
+  useEffect(() => {
+    const handleScrollAttempt = (e: WheelEvent) => {
+      // If canvas is already active, intercept scrolls to exit when scrolling UP
+      if (isLocked) {
+        if (e.deltaY < -25) { // Substantial scroll up
+          handleUnlock()
+        }
+        return
+      }
+
+      // If canvas is not active, scrolling DOWN triggers the lock
+      if (e.deltaY > 20) {
+        handleLock()
+      }
+    };
 
     const container = containerRef.current
     if (container) {
-      container.addEventListener('wheel', handleWheel, { passive: false })
-      return () => container.removeEventListener('wheel', handleWheel)
+      container.addEventListener('wheel', handleScrollAttempt, { passive: false })
+      return () => container.removeEventListener('wheel', handleScrollAttempt)
+    }
+  }, [isLocked])
+
+  // Touch triggers for mobile compatibility
+  const touchStartY = useRef(0)
+  
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (e.touches.length > 0) {
+      touchStartY.current = e.touches[0].clientY
+    }
+  }
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    const touchY = e.touches[0].clientY
+    const diff = touchY - touchStartY.current
+
+    if (isLocked) {
+      if (diff > 50) { // Swipe down = scroll up = unlock
+        handleUnlock()
+      }
+    } else {
+      if (diff < -50) { // Swipe up = scroll down = lock
+        handleLock()
+      }
+    }
+  }
+
+  const handleLock = () => {
+    setIsLocked(true)
+    setHasScrolledInit(true)
+    
+    // Apply body scroll locking smoothly
+    document.documentElement.style.overflow = 'hidden'
+    document.body.style.overflow = 'hidden'
+    document.body.style.position = 'fixed'
+    document.body.style.width = '100vw'
+    document.body.style.height = '100vh'
+  }
+
+  const handleUnlock = () => {
+    setIsLocked(false)
+    
+    // Restore body scrolling
+    document.documentElement.style.overflow = ''
+    document.body.style.overflow = ''
+    document.body.style.position = ''
+    document.body.style.width = ''
+    document.body.style.height = ''
+  }
+
+  const handleNavigation = (sectionId: string) => {
+    handleUnlock()
+    if (onNavigate) {
+      onNavigate(sectionId)
+    }
+  }
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      // Ensure scrolling is always restored when leaving the section
+      document.documentElement.style.overflow = ''
+      document.body.style.overflow = ''
+      document.body.style.position = ''
+      document.body.style.width = ''
+      document.body.style.height = ''
     }
   }, [])
 
-  // Handle drag
-  const handleMouseDown = (e: React.MouseEvent) => {
-    if (e.button !== 0) return // Only left click
-    
-    setIsDragging(true)
-    dragStateRef.current = {
-      startX: e.clientX,
-      startY: e.clientY,
-      startCamX: cameraX,
-      startCamY: cameraY,
-      isDragging: true,
-    }
-  }
-
-  useEffect(() => {
-    if (!isDragging) return
-
-    const handleMouseMove = (e: MouseEvent) => {
-      const deltaX = e.clientX - dragStateRef.current.startX
-      const deltaY = e.clientY - dragStateRef.current.startY
-
-      // Drag sensitivity based on zoom level
-      const dragSensitivity = 1 + zoom * 2
-      
-      setCameraX(dragStateRef.current.startCamX - deltaX * dragSensitivity)
-      setCameraY(dragStateRef.current.startCamY - deltaY * dragSensitivity)
-
-      // Calculate momentum
-      momentumRef.current.vx = deltaX * 0.1
-      momentumRef.current.vy = deltaY * 0.1
-    }
-
-    const handleMouseUp = () => {
-      setIsDragging(false)
-    }
-
-    document.addEventListener('mousemove', handleMouseMove)
-    document.addEventListener('mouseup', handleMouseUp)
-
-    return () => {
-      document.removeEventListener('mousemove', handleMouseMove)
-      document.removeEventListener('mouseup', handleMouseUp)
-    }
-  }, [isDragging, cameraX, cameraY, zoom])
-
-  // Momentum animation
-  useEffect(() => {
-    if (isDragging || (Math.abs(momentumRef.current.vx) < 0.1 && Math.abs(momentumRef.current.vy) < 0.1)) {
-      return
-    }
-
-    const momentum = setInterval(() => {
-      momentumRef.current.vx *= 0.95
-      momentumRef.current.vy *= 0.95
-
-      setCameraX(prev => prev - momentumRef.current.vx)
-      setCameraY(prev => prev - momentumRef.current.vy)
-
-      if (Math.abs(momentumRef.current.vx) < 0.1 && Math.abs(momentumRef.current.vy) < 0.1) {
-        clearInterval(momentum)
-      }
-    }, 16)
-
-    return () => clearInterval(momentum)
-  }, [isDragging])
-
-  // Calculate visible photos
-  const getVisiblePhotos = () => {
-    const viewportWidth = viewportRef.current?.clientWidth || window.innerWidth
-    const viewportHeight = viewportRef.current?.clientHeight || window.innerHeight
-
-    // Zoom from 0 (looking down) to 1 (far away)
-    const zoomScale = 1 + zoom * 8
-    const visibleWidth = (viewportWidth * zoomScale) / 2
-    const visibleHeight = (viewportHeight * zoomScale) / 2
-
-    return photosRef.current.filter(photo => {
-      // Depth-based scaling and opacity
-      const depthFactor = 1 + (photo.depth / DEPTH_LAYERS) * 3
-      
-      // Check if photo is within viewport bounds
-      const distX = Math.abs(photo.x - cameraX)
-      const distY = Math.abs(photo.y - cameraY)
-
-      return (
-        distX < visibleWidth + PHOTO_SIZE_BASE * depthFactor &&
-        distY < visibleHeight + PHOTO_SIZE_BASE * depthFactor
-      )
-    })
-  }
-
-  const visiblePhotos = getVisiblePhotos()
-
-  // Calculate photo properties based on depth
-  const getPhotoStyle = (photo: GalleryPhoto) => {
-    const depthFactor = 1 + (photo.depth / DEPTH_LAYERS) * 3
-    const scale = 1 / depthFactor
-    const opacity = Math.max(0.2, 1 - photo.depth / DEPTH_LAYERS * 0.6)
-    
-    // 3D perspective positioning
-    const offsetX = photo.x - cameraX
-    const offsetY = photo.y - cameraY
-    const zoomScale = 1 + zoom * 8
-
-    return {
-      transform: `
-        translate(${offsetX / zoomScale + window.innerWidth / 2}px, ${offsetY / zoomScale + window.innerHeight / 2}px)
-        scale(${scale})
-        translateZ(${photo.depth * 10}px)
-      `,
-      opacity,
-      zIndex: DEPTH_LAYERS - photo.depth,
-    }
-  }
-
   return (
-    <section
+    <div 
       ref={containerRef}
-      id="infinite-gallery"
-      className="relative w-full h-screen overflow-hidden bg-black"
-      style={{
-        perspective: '1000px',
-      }}
+      className="relative w-full min-h-screen bg-[#0a0a0a] flex flex-col justify-between overflow-hidden"
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
     >
-      {/* Viewport container */}
-      <div
-        ref={viewportRef}
-        className={`absolute inset-0 ${isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
-        onMouseDown={handleMouseDown}
-      >
-        {/* 3D Gallery Canvas */}
-        <div
-          className="absolute inset-0"
-          style={{
-            perspective: '1200px',
-            transformStyle: 'preserve-3d',
-          }}
-        >
-          {/* Photos */}
-          {visiblePhotos.map(photo => (
-            <div
-              key={photo.id}
-              className="absolute flex-shrink-0 group"
-              style={{
-                width: `${PHOTO_SIZE_BASE}px`,
-                height: `${PHOTO_SIZE_BASE}px`,
-                left: 0,
-                top: 0,
-                ...getPhotoStyle(photo),
-                transition: isDragging ? 'none' : 'transform 0.1s ease-out, opacity 0.1s ease-out',
-              }}
-              onMouseEnter={() => setHoveredPhoto(photo.id)}
-              onMouseLeave={() => setHoveredPhoto(null)}
-            >
-              {/* Image */}
-              <img
-                src={photo.src}
-                alt={photo.alt}
-                className="w-full h-full object-cover rounded-lg shadow-xl group-hover:shadow-2xl transition-shadow duration-300"
-                style={{
-                  filter: hoveredPhoto === photo.id ? 'grayscale(0%) contrast(1.1)' : 'grayscale(100%) contrast(0.9)',
-                  transition: 'filter 0.3s ease',
-                }}
-              />
+      {/* Grunge & Overlay effects */}
+      <div className="grunge-overlay opacity-5" />
+      <div className="scanlines opacity-10" />
 
-              {/* Depth overlay */}
-              <div className="absolute inset-0 rounded-lg bg-gradient-to-t from-black/40 to-transparent opacity-50 group-hover:opacity-75 transition-opacity duration-300" />
+      {/* HEADER SECTION (SCROLLABLE INTRO) */}
+      <div className="w-full max-w-7xl mx-auto px-6 md:px-12 pt-32 pb-16 flex-1 flex flex-col justify-center">
+        {/* Back to menu button */}
+        {onBack && (
+          <button
+            onClick={onBack}
+            className="fixed top-8 left-8 z-50 font-mono text-xs text-[#a8a29e] hover:text-[#f5f5dc] tracking-[0.2em] transition-colors flex items-center gap-2 cursor-none"
+          >
+            <span className="text-lg">←</span> RETURN
+          </button>
+        )}
 
-              {/* Label */}
-              {hoveredPhoto === photo.id && (
-                <div className="absolute inset-0 flex items-end justify-start p-2 rounded-lg">
-                  <span className="font-mono text-xs text-cream truncate">
-                    Depth: {photo.depth}
-                  </span>
-                </div>
-              )}
-            </div>
-          ))}
+        {/* Brand logo top right */}
+        <div className="fixed top-8 right-8 z-50">
+          <span 
+            className="text-2xl text-[#f5f5dc] tracking-[0.1em]"
+            style={{ fontFamily: 'Bebas Neue, Impact, sans-serif' }}
+          >
+            AI-TRONICS
+          </span>
         </div>
-      </div>
 
-      {/* UI Overlay */}
-      <div className="absolute top-0 left-0 right-0 pointer-events-none z-10">
-        <div className="max-w-7xl mx-auto px-4 md:px-8 py-8">
-          <h2 className="glitch-rgb font-sans text-3xl md:text-5xl text-cream tracking-wider" data-text="INFINITE ARCHIVE">
-            INFINITE ARCHIVE
-          </h2>
-          <p className="font-mono text-[#a8a29e] text-sm mt-2 tracking-widest">
-            // SCROLL TO ZOOM • DRAG TO EXPLORE
+        <div className="space-y-6 max-w-3xl">
+          <span className="font-mono text-xs text-stone tracking-[0.4em] uppercase block">
+            06 / ARCHIVE LABS
+          </span>
+          <h1 
+            className="glitch-rgb text-6xl md:text-8xl text-cream tracking-tight leading-[0.9] font-bold"
+            data-text="INFINITE SPACE"
+            style={{ fontFamily: 'Bebas Neue, Impact, sans-serif' }}
+          >
+            INFINITE SPACE
+          </h1>
+          <p className="font-mono text-sm md:text-base text-stone leading-relaxed">
+            Welcome to the floating antigravity intelligence archives. 
+            Scroll down to lock into the zero-gravity liquid workspace where core technology concepts repel from your presence, float on inertia, and respond to your direct momentum.
           </p>
         </div>
       </div>
 
-      {/* Zoom Level Indicator */}
-      <div className="absolute bottom-8 right-8 font-mono text-sm text-[#a8a29e] tracking-widest pointer-events-none">
-        <div>DEPTH: {Math.round(zoom * 100)}%</div>
-        <div>PHOTOS: {visiblePhotos.length}</div>
+      {/* SCROLL TRIGGER HINT */}
+      <div className="w-full flex flex-col items-center pb-12 animate-pulse">
+        <span className="font-mono text-[10px] text-stone tracking-[0.3em] uppercase mb-2">
+          Scroll Down to Initiate Canvas
+        </span>
+        <ArrowDown className="text-cream w-4 h-4 animate-bounce" />
       </div>
 
-      {/* Gradient Overlays for Depth Cueing */}
-      <div className="absolute inset-0 pointer-events-none">
-        {/* Vignette */}
-        <div className="absolute inset-0 rounded-full shadow-[inset_0_0_120px_60px_rgba(0,0,0,0.5)]" />
+      {/* FLOATING ANTIGRAVITY CANVAS OVERLAY */}
+      <div className={`gallery-canvas-wrapper ${isLocked ? 'active' : ''}`}>
+        {/* FLOATING NAVIGATION OVERLAY */}
+        <div className="gallery-nav">
+          {NAV_ITEMS.map((item) => (
+            <button
+              key={item.id}
+              onClick={() => handleNavigation(item.id)}
+              className="gallery-nav-link"
+            >
+              {item.label}
+            </button>
+          ))}
+        </div>
+
+        {/* CANVAS INTERACTIVE PORTAL */}
+        <div ref={canvasContainerRef} className="gallery-canvas" />
+
+        {/* EXIT CONTROL HINT & BUTTON */}
+        <div className="gallery-exit-indicator">
+          <button 
+            onClick={handleUnlock}
+            className="gallery-exit-button flex items-center gap-2 cursor-none"
+          >
+            <X size={12} />
+            EXIT LABS
+          </button>
+          <span className="font-mono text-[9px] text-stone tracking-[0.2em] uppercase mt-2 hidden md:block">
+            <ArrowUp className="inline w-3 h-3 mr-1 animate-bounce" />
+            Scroll Up to Exit
+          </span>
+        </div>
       </div>
-    </section>
+    </div>
   )
 }

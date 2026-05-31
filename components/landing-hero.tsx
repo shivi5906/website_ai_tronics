@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 
 interface Photo {
   id: number
@@ -55,7 +55,12 @@ const generatePhotos = (): Photo[] => {
   return photos
 }
 
-export default function LandingHero({ onEnter }: { onEnter: () => void }) {
+interface LandingHeroProps {
+  onEnter: () => void
+  onScrollDown?: () => void
+}
+
+export default function LandingHero({ onEnter, onScrollDown }: LandingHeroProps) {
   const [photos, setPhotos] = useState<Photo[]>(generatePhotos)
   const [isReady, setIsReady] = useState(false)
   const [hoveredPhoto, setHoveredPhoto] = useState<number | null>(null)
@@ -63,10 +68,55 @@ export default function LandingHero({ onEnter }: { onEnter: () => void }) {
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 })
   const [photoOffsets, setPhotoOffsets] = useState<{[key: number]: {x: number, y: number}}>({})
 
+  const touchStartY = useRef(0)
+
   useEffect(() => {
     const timer = setTimeout(() => setIsReady(true), 100)
     return () => clearTimeout(timer)
   }, [])
+
+  // Desktop wheel scroll down to open sections menu
+  useEffect(() => {
+    if (!onScrollDown) return
+
+    const handleScroll = (e: WheelEvent) => {
+      if (e.deltaY > 20) {
+        onScrollDown()
+      }
+    }
+
+    window.addEventListener('wheel', handleScroll, { passive: true })
+    return () => window.removeEventListener('wheel', handleScroll)
+  }, [onScrollDown])
+
+  // Mobile swipe up (scroll down) to open sections menu
+  useEffect(() => {
+    if (!onScrollDown) return
+
+    const handleTouchStart = (e: TouchEvent) => {
+      if (e.touches.length > 0) {
+        touchStartY.current = e.touches[0].clientY
+      }
+    }
+
+    const handleTouchMove = (e: TouchEvent) => {
+      if (e.touches.length > 0) {
+        const touchY = e.touches[0].clientY
+        const diff = touchY - touchStartY.current
+        if (diff < -40) { // Swipe up
+          onScrollDown()
+        }
+      }
+    }
+
+    window.addEventListener('touchstart', handleTouchStart, { passive: true })
+    window.addEventListener('touchmove', handleTouchMove, { passive: true })
+
+    return () => {
+      window.removeEventListener('touchstart', handleTouchStart)
+      window.removeEventListener('touchmove', handleTouchMove)
+    }
+  }, [onScrollDown])
 
   const handlePhotoMouseDown = (photoId: number) => (e: React.MouseEvent) => {
     setIsDragging(true)
@@ -211,9 +261,12 @@ export default function LandingHero({ onEnter }: { onEnter: () => void }) {
           </button>
 
           {/* Scroll indicator */}
-          <div className="mt-16 opacity-50">
-            <p className="font-mono text-[10px] text-[#6b6b6b] tracking-[0.2em] mb-2">
-              SCROLL OR CLICK + DRAG
+          <div 
+            onClick={onScrollDown}
+            className="mt-16 opacity-50 cursor-pointer hover:opacity-100 hover:text-cream transition-all duration-300"
+          >
+            <p className="font-mono text-[10px] text-[#6b6b6b] tracking-[0.2em] mb-2 uppercase">
+              Scroll or Click to Enter Menu
             </p>
             <div className="flex justify-center gap-1">
               <span className="w-1 h-1 bg-[#6b6b6b] rounded-full animate-pulse" />
