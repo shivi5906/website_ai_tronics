@@ -554,3 +554,172 @@
 .terminal-input:focus {
   border-bottom-color: var(--cream);
 }
+
+/* Gallery Row Scroll */
+.gallery-row {
+  display: flex;
+  width: max-content;
+  will-change: transform;
+}
+
+.gallery-row-reverse {
+  display: flex;
+  width: max-content;
+  will-change: transform;
+  flex-direction: row-reverse;
+}
+
+/* Glitch Text */
+.glitch-text {
+  position: relative;
+}
+
+/* Neon Cyan and Magenta */
+:root {
+  --neon-cyan: #00ffff;
+  --neon-magenta: #ff0040;
+}
+
+/* Smooth Scroll Behavior */
+.scroll-smooth {
+  scroll-behavior: smooth;
+}
+
+/* Infinite Physics-based Floating Gallery Styles */
+.gallery-canvas-container {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+  background: #000;
+}
+
+.gallery-canvas-wrapper {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 80;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+  background: radial-gradient(circle at center, rgba(15, 15, 15, 0.98) 0%, rgba(5, 5, 5, 1) 100%);
+}
+
+.gallery-canvas-wrapper.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.gallery-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.gallery-card {
+  position: absolute;
+  left: 0;
+  top: 0;
+  will-change: transform;
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+  touch-action: none;
+}
+
+/* Floating Navigation Menu on Canvas */
+.gallery-nav {
+  position: absolute;
+  top: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 0.75rem 2rem;
+  background: rgba(20, 20, 20, 0.5);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(245, 245, 220, 0.08);
+  border-radius: 9999px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  transition: all 0.4s ease;
+}
+
+.gallery-nav:hover {
+  background: rgba(30, 30, 30, 0.75);
+  border-color: rgba(245, 245, 220, 0.15);
+}
+
+.gallery-nav-link {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.25em;
+  color: var(--stone);
+  text-decoration: none;
+  background: none;
+  border: none;
+  padding: 0.25rem 0.5rem;
+  cursor: none !important;
+  transition: color 0.3s ease, text-shadow 0.3s ease;
+}
+
+.gallery-nav-link:hover,
+.gallery-nav-link.active {
+  color: var(--cream);
+  text-shadow: 0 0 8px rgba(245, 245, 220, 0.5);
+}
+
+/* Floating Exit Prompt */
+.gallery-exit-indicator {
+  position: absolute;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  pointer-events: auto;
+  cursor: none !important;
+}
+
+.gallery-exit-button {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.3em;
+  color: var(--stone);
+  background: rgba(20, 20, 20, 0.5);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(245, 245, 220, 0.08);
+  padding: 0.75rem 1.5rem;
+  border-radius: 9999px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
+.gallery-exit-button:hover {
+  color: var(--cream);
+  border-color: rgba(245, 245, 220, 0.3);
+  background: rgba(30, 30, 30, 0.8);
+  box-shadow: 0 0 20px rgba(245, 245, 220, 0.1);
+}
+
+.gallery-scroll-arrow {
+  animation: bounce-slow 2s infinite;
+  color: var(--muted);
+  font-size: 1.25rem;
+}
+
+@keyframes bounce-slow {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}

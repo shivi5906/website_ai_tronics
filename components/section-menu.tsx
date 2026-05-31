@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { X, ChevronRight } from 'lucide-react'
 
 interface Section {
@@ -16,6 +16,7 @@ const sections: Section[] = [
   { id: 'events', label: 'ARCHIVES', sublabel: 'Events & Memories', number: '03' },
   { id: 'vibe', label: 'NOW PLAYING', sublabel: 'Set Your Frequency', number: '04' },
   { id: 'contact', label: 'TRANSMIT', sublabel: 'Get In Touch', number: '05' },
+  { id: 'infinite-gallery', label: 'INFINITE', sublabel: 'Infinite Archive Experience', number: '06' },
 ]
 
 interface SectionMenuProps {
@@ -27,11 +28,57 @@ interface SectionMenuProps {
 
 export default function SectionMenu({ isOpen, onClose, onSelectSection, currentSection }: SectionMenuProps) {
   const [hoveredSection, setHoveredSection] = useState<string | null>(null)
+  const scrollContainerRef = useRef<HTMLDivElement>(null)
+  const touchStartY = useRef(0)
+
+  useEffect(() => {
+    if (!isOpen) return
+
+    const container = scrollContainerRef.current
+    if (!container) return
+
+    const handleScroll = (e: WheelEvent) => {
+      // Smooth scroll back to landing page if user scrolls UP at the top of the menu
+      if (container.scrollTop <= 2 && e.deltaY < -20) {
+        onClose()
+      }
+    }
+
+    const handleTouchStart = (e: TouchEvent) => {
+      if (e.touches.length > 0) {
+        touchStartY.current = e.touches[0].clientY
+      }
+    }
+
+    const handleTouchMove = (e: TouchEvent) => {
+      if (e.touches.length > 0) {
+        const touchY = e.touches[0].clientY
+        const diff = touchY - touchStartY.current
+        // Swipe down at the top of the menu scrolls up, transitioning back
+        if (container.scrollTop <= 2 && diff > 40) {
+          onClose()
+        }
+      }
+    }
+
+    container.addEventListener('wheel', handleScroll, { passive: true })
+    container.addEventListener('touchstart', handleTouchStart, { passive: true })
+    container.addEventListener('touchmove', handleTouchMove, { passive: true })
+
+    return () => {
+      container.removeEventListener('wheel', handleScroll)
+      container.removeEventListener('touchstart', handleTouchStart)
+      container.removeEventListener('touchmove', handleTouchMove)
+    }
+  }, [isOpen, onClose])
 
   if (!isOpen) return null
 
   return (
-    <div className="fixed inset-0 z-[100] bg-[#0a0a0a]">
+    <div 
+      ref={scrollContainerRef}
+      className="absolute inset-0 z-[100] bg-[#0a0a0a] overflow-y-auto py-12 scrollbar-thin"
+    >
       {/* Grunge overlay */}
       <div className="grunge-overlay" />
       

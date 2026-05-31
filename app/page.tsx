@@ -10,15 +10,16 @@ import AboutSection from '@/components/about-section'
 import EventsSection from '@/components/events-section'
 import VibeSection from '@/components/vibe-section'
 import ContactSection from '@/components/contact-section'
+import InfiniteGallerySection from '@/components/infinite-gallery-section'
 
-type ViewState = 'landing' | 'menu' | 'team' | 'about' | 'events' | 'vibe' | 'contact'
+type ViewState = 'landing' | 'menu' | 'team' | 'about' | 'events' | 'vibe' | 'contact' | 'infinite-gallery'
 
 export default function Home() {
   const [isLoaded, setIsLoaded] = useState(false)
   const [currentView, setCurrentView] = useState<ViewState>('landing')
 
   const handleEnterSociety = () => {
-    setCurrentView('menu')
+    setCurrentView('infinite-gallery')
   }
 
   const handleSelectSection = (sectionId: string) => {
@@ -32,15 +33,38 @@ export default function Home() {
   const renderCurrentView = () => {
     switch (currentView) {
       case 'landing':
-        return <LandingHero onEnter={handleEnterSociety} />
       case 'menu':
         return (
-          <SectionMenu
-            isOpen={true}
-            onClose={() => setCurrentView('landing')}
-            onSelectSection={handleSelectSection}
-            currentSection={null}
-          />
+          <div className="relative w-full h-screen overflow-hidden">
+            {/* Landing Hero */}
+            <div 
+              className="absolute inset-0 transition-transform duration-[800ms] ease-[cubic-bezier(0.25,1,0.5,1)]"
+              style={{
+                transform: currentView === 'landing' ? 'translateY(0)' : 'translateY(-100%)',
+              }}
+            >
+              <LandingHero 
+                onEnter={handleEnterSociety} 
+                onScrollDown={() => setCurrentView('menu')} 
+              />
+            </div>
+
+            {/* Section Menu */}
+            <div 
+              className="absolute inset-0 transition-transform duration-[800ms] ease-[cubic-bezier(0.25,1,0.5,1)] z-50"
+              style={{
+                transform: currentView === 'menu' ? 'translateY(0)' : 'translateY(100%)',
+                pointerEvents: currentView === 'menu' ? 'auto' : 'none',
+              }}
+            >
+              <SectionMenu
+                isOpen={true}
+                onClose={() => setCurrentView('landing')}
+                onSelectSection={handleSelectSection}
+                currentSection={null}
+              />
+            </div>
+          </div>
         )
       case 'team':
         return <TeamSection onBack={handleBackToMenu} />
@@ -52,6 +76,8 @@ export default function Home() {
         return <VibeSection onBack={handleBackToMenu} />
       case 'contact':
         return <ContactSection onBack={handleBackToMenu} />
+      case 'infinite-gallery':
+        return <InfiniteGallerySection onBack={handleBackToMenu} onNavigate={handleSelectSection} />
       default:
         return <LandingHero onEnter={handleEnterSociety} />
     }

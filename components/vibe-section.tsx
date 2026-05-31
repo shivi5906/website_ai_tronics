@@ -60,7 +60,7 @@ export default function VibeSection({ onBack }: VibeSectionProps) {
   }
 
   return (
-    <section className="min-h-screen bg-[#0a0a0a] relative overflow-hidden portal-enter">
+    <section className="min-h-screen bg-[#0a0a0a] relative overflow-y-auto max-h-screen scrollbar-thin portal-enter">
       {/* Grunge overlay */}
       <div className="grunge-overlay" />
 

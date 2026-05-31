@@ -40,7 +40,7 @@ export default function ContactSection({ onBack }: ContactSectionProps) {
   }
 
   return (
-    <section className="min-h-screen bg-[#0a0a0a] relative overflow-hidden portal-enter flex items-center">
+    <section className="min-h-screen bg-[#0a0a0a] relative overflow-y-auto max-h-screen scrollbar-thin portal-enter flex flex-col justify-center">
       {/* Grunge overlay */}
       <div className="grunge-overlay" />
 
