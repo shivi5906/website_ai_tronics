@@ -29,9 +29,10 @@ const NAV_ITEMS = [
 interface InfiniteGallerySectionProps {
   onBack?: () => void
   onNavigate?: (sectionId: string) => void
+  onHome?: () => void
 }
 
-export default function InfiniteGallerySection({ onBack, onNavigate }: InfiniteGallerySectionProps) {
+export default function InfiniteGallerySection({ onBack, onNavigate, onHome }: InfiniteGallerySectionProps) {
   const canvasContainerRef = useRef<HTMLDivElement>(null)
   const galleryEngineRef = useRef<GalleryCanvas | null>(null)
 
@@ -103,13 +104,14 @@ export default function InfiniteGallerySection({ onBack, onNavigate }: InfiniteG
   return (
     <div className="relative w-full h-screen bg-[#0a0a0a] overflow-hidden">
       {/* Brand logo top right */}
-      <div className="fixed top-8 right-8 z-50 pointer-events-none hidden md:block">
-        <span 
-          className="text-2xl text-[#f5f5dc] tracking-[0.1em]"
+      <div className="fixed top-8 right-8 z-50 hidden md:block">
+        <button
+          onClick={onHome}
+          className="text-2xl text-[#f5f5dc] tracking-[0.1em] hover:text-[#a8a29e] transition-colors cursor-pointer bg-transparent border-none p-0"
           style={{ fontFamily: 'Bebas Neue, Impact, sans-serif' }}
         >
           AI-TRONICS
-        </span>
+        </button>
       </div>
 
       {/* FLOATING NAVIGATION OVERLAY */}

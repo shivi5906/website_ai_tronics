@@ -63,9 +63,10 @@ const galleryImages: GalleryImage[] = [
 
 interface EventsSectionProps {
   onBack: () => void
+  onHome?: () => void
 }
 
-export default function EventsSection({ onBack }: EventsSectionProps) {
+export default function EventsSection({ onBack, onHome }: EventsSectionProps) {
   const [isVisible, setIsVisible] = useState(false)
   const [selectedImage, setSelectedImage] = useState<GalleryImage | null>(null)
 
@@ -89,12 +90,13 @@ export default function EventsSection({ onBack }: EventsSectionProps) {
 
       {/* Header */}
       <div className="fixed top-8 right-8 z-50 hidden md:block">
-        <span 
-          className="text-2xl text-[#f5f5dc] tracking-[0.1em]"
+        <button
+          onClick={onHome}
+          className="text-2xl text-[#f5f5dc] tracking-[0.1em] hover:text-[#a8a29e] transition-colors cursor-pointer bg-transparent border-none p-0"
           style={{ fontFamily: 'Bebas Neue, Impact, sans-serif' }}
         >
           AI-TRONICS
-        </span>
+        </button>
       </div>
 
       <div className="pt-32 pb-12 px-4 md:px-8">

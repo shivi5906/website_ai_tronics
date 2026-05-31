@@ -118,17 +118,17 @@ export default function Home() {
           </div>
         )
       case 'team':
-        return <TeamSection onBack={handleBackToMenu} />
+        return <TeamSection onBack={handleBackToMenu} onHome={() => setCurrentView('landing')} />
       case 'about':
-        return <AboutSection onBack={handleBackToMenu} />
+        return <AboutSection onBack={handleBackToMenu} onHome={() => setCurrentView('landing')} />
       case 'events':
-        return <EventsSection onBack={handleBackToMenu} />
+        return <EventsSection onBack={handleBackToMenu} onHome={() => setCurrentView('landing')} />
       case 'vibe':
-        return <VibeSection onBack={handleBackToMenu} />
+        return <VibeSection onBack={handleBackToMenu} onHome={() => setCurrentView('landing')} />
       case 'contact':
-        return <ContactSection onBack={handleBackToMenu} />
+        return <ContactSection onBack={handleBackToMenu} onHome={() => setCurrentView('landing')} />
       case 'infinite-gallery':
-        return <InfiniteGallerySection onBack={handleBackToMenu} onNavigate={handleSelectSection} />
+        return <InfiniteGallerySection onBack={handleBackToMenu} onNavigate={handleSelectSection} onHome={() => setCurrentView('landing')} />
       default:
         return <LandingHero onEnter={handleEnterSociety} />
     }
