@@ -82,27 +82,30 @@ export default function SectionMenu({ isOpen, onClose, onSelectSection, currentS
       {/* Grunge overlay */}
       <div className="grunge-overlay" />
       
-      {/* Close button */}
-      <button
-        onClick={onClose}
-        className="absolute top-8 right-8 z-50 p-2 text-[#a8a29e] hover:text-[#f5f5dc] transition-colors"
-      >
-        <X size={24} />
-      </button>
-
-      {/* Header */}
-      <div className="absolute top-8 left-8">
-        <span 
-          className="text-3xl md:text-4xl text-[#f5f5dc] tracking-[0.1em]"
-          style={{ fontFamily: 'Bebas Neue, Impact, sans-serif' }}
+      {/* Top fixed header bar */}
+      <div className="fixed top-0 left-0 right-0 z-[110] flex items-center justify-between px-6 py-6 md:px-12 md:py-8 bg-gradient-to-b from-[#0a0a0a] via-[#0a0a0a]/90 to-transparent pointer-events-none">
+        {/* Logo */}
+        <div className="pointer-events-auto">
+          <span 
+            className="text-xl md:text-2xl text-[#f5f5dc] tracking-[0.2em]"
+            style={{ fontFamily: 'Bebas Neue, Impact, sans-serif' }}
+          >
+            AI-TRONICS
+          </span>
+        </div>
+        
+        {/* Close button */}
+        <button
+          onClick={onClose}
+          className="p-2 text-[#a8a29e] hover:text-[#f5f5dc] transition-colors pointer-events-auto cursor-pointer"
         >
-          AI-TRONICS
-        </span>
+          <X size={24} />
+        </button>
       </div>
 
       {/* Menu Content */}
-      <div className="h-full flex items-center justify-center px-8">
-        <div className="w-full max-w-4xl">
+      <div className="w-full max-w-4xl mx-auto px-6 md:px-8 pt-36 md:pt-44 pb-16">
+        <div>
           {/* Title */}
           <p className="font-mono text-xs text-[#6b6b6b] tracking-[0.4em] mb-12 uppercase">
             Navigate The Society
@@ -116,23 +119,23 @@ export default function SectionMenu({ isOpen, onClose, onSelectSection, currentS
                 onClick={() => onSelectSection(section.id)}
                 onMouseEnter={() => setHoveredSection(section.id)}
                 onMouseLeave={() => setHoveredSection(null)}
-                className={`menu-item w-full text-left py-6 border-b border-[#2a2a2a] flex items-center justify-between group transition-all duration-500 ${
+                className={`menu-item w-full text-left py-5 md:py-6 border-b border-[#2a2a2a] flex flex-col md:flex-row md:items-center justify-between group transition-all duration-500 gap-3 md:gap-6 ${
                   currentSection === section.id ? 'border-[#f5f5dc]/30' : ''
                 }`}
                 style={{
                   animationDelay: `${index * 0.1}s`,
                 }}
               >
-                <div className="flex items-center gap-8">
+                <div className="flex items-center gap-4 md:gap-8">
                   {/* Number */}
-                  <span className="font-mono text-xs text-[#6b6b6b] w-8">
+                  <span className="font-mono text-xs text-[#6b6b6b] w-6 md:w-8 flex-shrink-0">
                     {section.number}
                   </span>
                   
                   {/* Main Label with RGB effect on hover */}
                   <div className="relative">
                     <span 
-                      className={`text-4xl md:text-6xl lg:text-7xl tracking-[0.05em] transition-all duration-300 ${
+                      className={`text-4xl md:text-5xl lg:text-6xl xl:text-7xl tracking-[0.05em] transition-all duration-300 ${
                         hoveredSection === section.id ? 'text-[#f5f5dc]' : 'text-[#a8a29e]'
                       } ${currentSection === section.id ? 'text-[#f5f5dc]' : ''}`}
                       style={{ fontFamily: 'Bebas Neue, Impact, sans-serif' }}
@@ -144,7 +147,7 @@ export default function SectionMenu({ isOpen, onClose, onSelectSection, currentS
                     {hoveredSection === section.id && (
                       <>
                         <span 
-                          className="absolute inset-0 text-4xl md:text-6xl lg:text-7xl tracking-[0.05em] opacity-50 pointer-events-none"
+                          className="absolute inset-0 text-4xl md:text-5xl lg:text-6xl xl:text-7xl tracking-[0.05em] opacity-50 pointer-events-none"
                           style={{ 
                             fontFamily: 'Bebas Neue, Impact, sans-serif',
                             color: '#ff0040',
@@ -154,7 +157,7 @@ export default function SectionMenu({ isOpen, onClose, onSelectSection, currentS
                           {section.label}
                         </span>
                         <span 
-                          className="absolute inset-0 text-4xl md:text-6xl lg:text-7xl tracking-[0.05em] opacity-50 pointer-events-none"
+                          className="absolute inset-0 text-4xl md:text-5xl lg:text-6xl xl:text-7xl tracking-[0.05em] opacity-50 pointer-events-none"
                           style={{ 
                             fontFamily: 'Bebas Neue, Impact, sans-serif',
                             color: '#00ffff',
@@ -169,7 +172,7 @@ export default function SectionMenu({ isOpen, onClose, onSelectSection, currentS
                 </div>
 
                 {/* Sublabel & Arrow */}
-                <div className="flex items-center gap-6">
+                <div className="flex items-center justify-between md:justify-end gap-6 pl-10 md:pl-0 w-full md:w-auto">
                   <span className={`font-mono text-xs tracking-[0.2em] transition-all duration-300 ${
                     hoveredSection === section.id ? 'text-[#a8a29e]' : 'text-[#6b6b6b]'
                   }`}>

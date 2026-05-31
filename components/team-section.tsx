@@ -77,7 +77,7 @@ export default function TeamSection({ onBack }: TeamSectionProps) {
       </button>
 
       {/* Header */}
-      <div className="fixed top-8 right-8 z-50">
+      <div className="fixed top-8 right-8 z-50 hidden md:block">
         <span 
           className="text-2xl text-[#f5f5dc] tracking-[0.1em]"
           style={{ fontFamily: 'Bebas Neue, Impact, sans-serif' }}
@@ -136,18 +136,8 @@ function TeamCard({ member, delay, isVisible }: { member: TeamMember; delay: num
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      {/* Classified Stamp Overlay */}
-      <div className={`absolute inset-0 flex items-center justify-center bg-[#0a0a0a]/90 transition-opacity duration-500 z-10 ${isHovered ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
-        <div 
-          className="text-[#6b6b6b] text-2xl tracking-[0.3em] rotate-[-12deg] border-2 border-[#6b6b6b] px-4 py-2"
-          style={{ fontFamily: 'Bebas Neue, Impact, sans-serif' }}
-        >
-          CLASSIFIED
-        </div>
-      </div>
-
       {/* Member Photo */}
-      <div className="relative aspect-[4/5] mb-4 overflow-hidden">
+      <div className="relative aspect-[4/5] mb-4 overflow-hidden border border-[#2a2a2a]">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={member.image}
@@ -159,12 +149,12 @@ function TeamCard({ member, delay, isVisible }: { member: TeamMember; delay: num
         
         {/* RGB overlay on hover */}
         <div className={`absolute inset-0 transition-opacity duration-300 ${isHovered ? 'opacity-100' : 'opacity-0'}`}>
-          <div className="absolute inset-0 bg-gradient-to-br from-[#ff0040]/20 to-transparent mix-blend-overlay" />
-          <div className="absolute inset-0 bg-gradient-to-tl from-[#00ffff]/20 to-transparent mix-blend-overlay" />
+          <div className="absolute inset-0 bg-gradient-to-br from-[#ff0040]/10 to-transparent mix-blend-overlay" />
+          <div className="absolute inset-0 bg-gradient-to-tl from-[#00ffff]/10 to-transparent mix-blend-overlay" />
         </div>
         
         {/* Scan line effect */}
-        <div className={`absolute inset-0 bg-gradient-to-b from-transparent via-[#f5f5dc]/20 to-transparent transition-transform duration-1000 ${isHovered ? 'translate-y-full' : '-translate-y-full'}`} />
+        <div className={`absolute inset-0 bg-gradient-to-b from-transparent via-[#f5f5dc]/15 to-transparent transition-transform duration-1000 ${isHovered ? 'translate-y-full' : '-translate-y-full'}`} />
       </div>
 
       {/* Member Info */}
@@ -179,17 +169,17 @@ function TeamCard({ member, delay, isVisible }: { member: TeamMember; delay: num
       {/* Social Links */}
       <div className="flex gap-4">
         {member.github && (
-          <a href={member.github} className="text-[#6b6b6b] hover:text-[#f5f5dc] transition-colors">
+          <a href={member.github} className="text-[#6b6b6b] hover:text-[#f5f5dc] transition-colors cursor-pointer">
             <Github size={16} />
           </a>
         )}
         {member.instagram && (
-          <a href={member.instagram} className="text-[#6b6b6b] hover:text-[#f5f5dc] transition-colors">
+          <a href={member.instagram} className="text-[#6b6b6b] hover:text-[#f5f5dc] transition-colors cursor-pointer">
             <Instagram size={16} />
           </a>
         )}
         {member.linkedin && (
-          <a href={member.linkedin} className="text-[#6b6b6b] hover:text-[#f5f5dc] transition-colors">
+          <a href={member.linkedin} className="text-[#6b6b6b] hover:text-[#f5f5dc] transition-colors cursor-pointer">
             <Linkedin size={16} />
           </a>
         )}

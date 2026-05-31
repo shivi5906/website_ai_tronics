@@ -53,7 +53,7 @@ export default function ContactSection({ onBack }: ContactSectionProps) {
       </button>
 
       {/* Header */}
-      <div className="fixed top-8 right-8 z-50">
+      <div className="fixed top-8 right-8 z-50 hidden md:block">
         <span 
           className="text-2xl text-[#f5f5dc] tracking-[0.1em]"
           style={{ fontFamily: 'Bebas Neue, Impact, sans-serif' }}
@@ -87,8 +87,8 @@ export default function ContactSection({ onBack }: ContactSectionProps) {
               className={`space-y-8 transition-all duration-1000 delay-300 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
             >
               {/* Name Field */}
-              <div className="flex items-center gap-4">
-                <span className="font-mono text-xs text-[#a8a29e] whitespace-nowrap tracking-wider">
+              <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4">
+                <span className="font-mono text-xs text-[#a8a29e] tracking-wider">
                   {'>'} NAME:
                 </span>
                 <input
@@ -103,8 +103,8 @@ export default function ContactSection({ onBack }: ContactSectionProps) {
               </div>
 
               {/* Email Field */}
-              <div className="flex items-center gap-4">
-                <span className="font-mono text-xs text-[#a8a29e] whitespace-nowrap tracking-wider">
+              <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4">
+                <span className="font-mono text-xs text-[#a8a29e] tracking-wider">
                   {'>'} EMAIL:
                 </span>
                 <input
@@ -119,8 +119,8 @@ export default function ContactSection({ onBack }: ContactSectionProps) {
               </div>
 
               {/* Message Field */}
-              <div className="flex items-start gap-4">
-                <span className="font-mono text-xs text-[#a8a29e] whitespace-nowrap pt-3 tracking-wider">
+              <div className="flex flex-col md:flex-row md:items-start gap-2 md:gap-4">
+                <span className="font-mono text-xs text-[#a8a29e] pt-0 md:pt-3 tracking-wider">
                   {'>'} WHY AI-TRONICS?:
                 </span>
                 <textarea

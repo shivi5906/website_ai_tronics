@@ -77,7 +77,7 @@ export default function AboutSection({ onBack }: AboutSectionProps) {
       </button>
 
       {/* Header */}
-      <div className="fixed top-8 right-8 z-50">
+      <div className="fixed top-8 right-8 z-50 hidden md:block">
         <span 
           className="text-2xl text-[#f5f5dc] tracking-[0.1em]"
           style={{ fontFamily: 'Bebas Neue, Impact, sans-serif' }}
@@ -137,7 +137,7 @@ export default function AboutSection({ onBack }: AboutSectionProps) {
             {stats.map((stat, index) => (
               <div key={index} className="text-center">
                 <div 
-                  className="text-6xl md:text-8xl lg:text-9xl text-[#f5f5dc]"
+                  className="text-4xl sm:text-6xl md:text-8xl lg:text-9xl text-[#f5f5dc]"
                   style={{ fontFamily: 'Bebas Neue, Impact, sans-serif' }}
                 >
                   {counters[index] === -1 ? '∞' : counters[index]}{stat.suffix}
