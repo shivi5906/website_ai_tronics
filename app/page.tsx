@@ -62,7 +62,7 @@ export default function Home() {
       window.addEventListener('click', handleUserInteract)
       window.addEventListener('touchstart', handleUserInteract)
       window.addEventListener('keydown', handleUserInteract)
-    }, 2000)
+    }, 200)
 
     return () => clearTimeout(timer)
   }, [isLoaded])
