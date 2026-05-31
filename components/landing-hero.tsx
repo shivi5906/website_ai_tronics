@@ -2,14 +2,20 @@
 
 import { useState, useEffect, useRef } from 'react'
 
+interface Position {
+  x: number
+  y: number
+  w: number
+  h: number
+}
+
 interface Photo {
   id: number
   src: string
   alt: string
-  x: number
-  y: number
-  width: number
-  height: number
+  desktop: Position
+  tablet: Position
+  mobile: Position
   rotate: number
   delay: number
 }
@@ -17,19 +23,51 @@ interface Photo {
 // Generate scattered photo positions
 const generatePhotos = (): Photo[] => {
   const photos: Photo[] = []
-  const positions = [
-    { x: 5, y: 8, w: 180, h: 220 },
-    { x: 75, y: 5, w: 160, h: 200 },
-    { x: 20, y: 55, w: 140, h: 180 },
-    { x: 60, y: 40, w: 200, h: 250 },
-    { x: 85, y: 60, w: 150, h: 190 },
-    { x: 8, y: 75, w: 170, h: 210 },
-    { x: 40, y: 80, w: 130, h: 160 },
-    { x: 70, y: 85, w: 190, h: 230 },
-    { x: 35, y: 15, w: 150, h: 185 },
-    { x: 55, y: 70, w: 160, h: 200 },
-    { x: 15, y: 35, w: 145, h: 175 },
-    { x: 80, y: 30, w: 165, h: 205 },
+  const desktopPositions = [
+    { x: 5, y: 8, w: 140, h: 175 },     // Top-left corner (0)
+    { x: 18, y: 10, w: 135, h: 165 },   // Top-left-center (1)
+    { x: 6, y: 34, w: 130, h: 160 },    // Mid-left (2)
+    { x: 5, y: 58, w: 135, h: 165 },    // Lower-left (3)
+    { x: 15, y: 78, w: 140, h: 175 },   // Bottom-left-center (4)
+    { x: 30, y: 82, w: 125, h: 155 },   // Bottom-center-left (5)
+    { x: 86, y: 8, w: 140, h: 175 },     // Top-right corner (6)
+    { x: 72, y: 10, w: 135, h: 165 },   // Top-right-center (7)
+    { x: 85, y: 34, w: 130, h: 160 },    // Mid-right (8)
+    { x: 86, y: 58, w: 135, h: 165 },    // Lower-right (9)
+    { x: 74, y: 78, w: 140, h: 175 },   // Bottom-right-center (10)
+    { x: 58, y: 82, w: 125, h: 155 },   // Bottom-center-right (11)
+  ]
+
+  const tabletPositions = [
+    { x: 6, y: 8, w: 130, h: 160 },     // Top-left corner
+    { x: 6, y: 44, w: 125, h: 155 },    // Mid-left
+    { x: 6, y: 78, w: 130, h: 160 },    // Bottom-left corner
+    { x: 85, y: 8, w: 130, h: 160 },     // Top-right corner
+    { x: 85, y: 44, w: 125, h: 155 },    // Mid-right
+    { x: 85, y: 78, w: 130, h: 160 },    // Bottom-right corner
+    { x: 28, y: 8, w: 120, h: 150 },    // Top-center-left
+    { x: 64, y: 8, w: 120, h: 150 },    // Top-center-right
+    // Fallbacks
+    { x: 6, y: 8, w: 130, h: 160 },
+    { x: 85, y: 8, w: 130, h: 160 },
+    { x: 6, y: 78, w: 130, h: 160 },
+    { x: 85, y: 78, w: 130, h: 160 },
+  ]
+
+  const mobilePositions = [
+    { x: 6, y: 10, w: 110, h: 135 },    // Top-left corner
+    { x: 84, y: 10, w: 110, h: 135 },   // Top-right corner
+    { x: 6, y: 84, w: 110, h: 135 },    // Bottom-left corner
+    { x: 84, y: 84, w: 110, h: 135 },   // Bottom-right corner
+    // Fallbacks
+    { x: 6, y: 10, w: 110, h: 135 },
+    { x: 84, y: 10, w: 110, h: 135 },
+    { x: 6, y: 84, w: 110, h: 135 },
+    { x: 84, y: 84, w: 110, h: 135 },
+    { x: 6, y: 10, w: 110, h: 135 },
+    { x: 84, y: 10, w: 110, h: 135 },
+    { x: 6, y: 84, w: 110, h: 135 },
+    { x: 84, y: 84, w: 110, h: 135 },
   ]
 
   const labels = [
@@ -38,15 +76,14 @@ const generatePhotos = (): Photo[] => {
     'IDEATION', 'PROTOTYPE', 'DEMO DAY', 'LAUNCH'
   ]
 
-  positions.forEach((pos, i) => {
+  labels.forEach((label, i) => {
     photos.push({
       id: i,
-      src: `https://picsum.photos/seed/aitronics${i}/${pos.w}/${pos.h}?grayscale`,
-      alt: labels[i],
-      x: pos.x,
-      y: pos.y,
-      width: pos.w,
-      height: pos.h,
+      src: `/gallery/landing/photo${i}.jpg`,
+      alt: label,
+      desktop: desktopPositions[i],
+      tablet: tabletPositions[i],
+      mobile: mobilePositions[i],
       rotate: (Math.random() - 0.5) * 12,
       delay: Math.random() * 2,
     })
@@ -69,6 +106,7 @@ export default function LandingHero({ onEnter, onScrollDown, isMuted = false, on
   const [isDragging, setIsDragging] = useState(false)
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 })
   const [photoOffsets, setPhotoOffsets] = useState<{[key: number]: {x: number, y: number}}>({})
+  const [breakpoint, setBreakpoint] = useState<'mobile' | 'tablet' | 'desktop'>('desktop')
 
   const touchStartY = useRef(0)
 
@@ -76,6 +114,23 @@ export default function LandingHero({ onEnter, onScrollDown, isMuted = false, on
     setPhotos(generatePhotos())
     const timer = setTimeout(() => setIsReady(true), 100)
     return () => clearTimeout(timer)
+  }, [])
+
+  useEffect(() => {
+    const handleResize = () => {
+      const width = window.innerWidth
+      if (width < 768) {
+        setBreakpoint('mobile')
+      } else if (width < 1024) {
+        setBreakpoint('tablet')
+      } else {
+        setBreakpoint('desktop')
+      }
+    }
+    
+    handleResize()
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
   }, [])
 
   // Desktop wheel scroll down to open sections menu
@@ -166,7 +221,13 @@ export default function LandingHero({ onEnter, onScrollDown, isMuted = false, on
       {/* Scattered Photos Background */}
       <div className="absolute inset-0">
         {photos.map((photo) => {
+          // Responsive layout filtration to prevent mobile/tablet clutter
+          if (breakpoint === 'mobile' && photo.id >= 4) return null
+          if (breakpoint === 'tablet' && photo.id >= 8) return null
+
+          const pos = photo[breakpoint]
           const offset = photoOffsets[photo.id] || { x: 0, y: 0 }
+          
           return (
             <div
               key={photo.id}
@@ -176,10 +237,10 @@ export default function LandingHero({ onEnter, onScrollDown, isMuted = false, on
                 hoveredPhoto === photo.id ? 'cursor-grab active:cursor-grabbing' : 'cursor-pointer'
               }`}
               style={{
-                left: `${photo.x}%`,
-                top: `${photo.y}%`,
-                width: photo.width,
-                height: photo.height,
+                left: `calc(${pos.x}% - (${pos.w}px * var(--size-multiplier, 1) * ${pos.x} / 100))`,
+                top: `calc(${pos.y}% - (${pos.h}px * var(--size-multiplier, 1) * ${pos.y} / 100))`,
+                width: `clamp(${pos.w * 0.5}px, calc(${pos.w}px * var(--size-multiplier, 1)), ${pos.w * 1.1}px)`,
+                height: `clamp(${pos.h * 0.5}px, calc(${pos.h}px * var(--size-multiplier, 1)), ${pos.h * 1.1}px)`,
                 transform: `rotate(${photo.rotate}deg) scale(${hoveredPhoto === photo.id ? 1.1 : 1}) translate(${offset.x}px, ${offset.y}px)`,
                 transitionDelay: isDragging ? '0s' : `${photo.delay * 0.3}s`,
                 zIndex: hoveredPhoto === photo.id ? 50 : photo.id,
@@ -201,6 +262,31 @@ export default function LandingHero({ onEnter, onScrollDown, isMuted = false, on
                 className="w-full h-full object-cover select-none"
                 style={{ filter: 'contrast(1.1) brightness(0.9)' }}
                 draggable={false}
+                decoding="async"
+                onError={(e) => {
+                  const img = e.currentTarget;
+                  
+                  // Avoid infinite loop if all options fail
+                  if (img.dataset.failedCount === '5') return;
+                  
+                  const count = parseInt(img.dataset.failedCount || '0', 10);
+                  img.dataset.failedCount = String(count + 1);
+
+                  // Extract base URL path (e.g. /gallery/landing/photo1)
+                  const basePath = `/gallery/landing/photo${photo.id}`;
+                  
+                  const fallbacks = [
+                    `${basePath}.JPG`,
+                    `${basePath}.jpeg`,
+                    `${basePath}.JPEG`,
+                    `${basePath}.png`,
+                    `https://picsum.photos/seed/aitronics${photo.id}/${pos.w}/${pos.h}?grayscale` // ultimate placeholder backup
+                  ];
+                  
+                  if (count < fallbacks.length) {
+                    img.src = fallbacks[count];
+                  }
+                }}
               />
               {/* Photo label overlay */}
               <div className={`absolute inset-0 flex items-end justify-start p-3 bg-gradient-to-t from-black/70 to-transparent transition-opacity duration-300 ${

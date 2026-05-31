@@ -216,6 +216,28 @@
   position: absolute;
   transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
   filter: grayscale(100%) contrast(1.1);
+  --size-multiplier: 1;
+  will-change: transform, filter, opacity;
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+}
+
+@media (max-width: 640px) {
+  .gallery-photo {
+    --size-multiplier: 0.45;
+  }
+}
+
+@media (min-width: 641px) and (max-width: 1024px) {
+  .gallery-photo {
+    --size-multiplier: 0.7;
+  }
+}
+
+@media (min-width: 1025px) and (max-width: 1440px) {
+  .gallery-photo {
+    --size-multiplier: 0.85;
+  }
 }
 
 .gallery-photo:hover {
@@ -436,6 +458,7 @@
 .float-photo {
   animation: photo-float 8s ease-in-out infinite;
   animation-delay: var(--float-delay, 0s);
+  will-change: transform;
 }
 
 @keyframes photo-float {
