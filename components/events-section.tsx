@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { X } from 'lucide-react'
 
 interface GalleryImage {
@@ -13,7 +13,7 @@ interface GalleryImage {
 const galleryImages: GalleryImage[] = [
   { 
     src: 'https://picsum.photos/seed/event1/600/400?grayscale', 
-    title: 'HACKATHON 2024', 
+    title: 'HACKATHON 2026', 
     date: 'MAR 15',
     description: 'Our flagship 24-hour coding sprint where innovators build high-impact artificial intelligence models and robotic controllers to solve critical, real-world problems under intense time constraints.'
   },
@@ -70,10 +70,124 @@ export default function EventsSection({ onBack, onHome }: EventsSectionProps) {
   const [isVisible, setIsVisible] = useState(false)
   const [selectedImage, setSelectedImage] = useState<GalleryImage | null>(null)
 
+  const row1Ref = useRef<HTMLDivElement>(null)
+  const row2Ref = useRef<HTMLDivElement>(null)
+
+  const isInteractingRow1 = useRef(false)
+  const isInteractingRow2 = useRef(false)
+  const isDraggingActive = useRef(false)
+
+  const dragStart1 = useRef({ x: 0, scrollLeft: 0 })
+  const dragStart2 = useRef({ x: 0, scrollLeft: 0 })
+
   useEffect(() => {
     const timer = setTimeout(() => setIsVisible(true), 100)
     return () => clearTimeout(timer)
   }, [])
+
+  // Immersive infinite marquee auto-scroll effect
+  useEffect(() => {
+    let animationFrameId: number
+    const speed = 0.85 // Smooth constant pixels-per-frame speed
+
+    const updateScroll = () => {
+      // Row 1: Left to Right (increasing scrollLeft)
+      if (row1Ref.current && !isInteractingRow1.current) {
+        const el = row1Ref.current
+        const oneThird = el.scrollWidth / 3
+        el.scrollLeft += speed
+        if (el.scrollLeft >= oneThird * 2) {
+          el.scrollLeft -= oneThird
+        }
+      }
+
+      // Row 2: Right to Left (decreasing scrollLeft)
+      if (row2Ref.current && !isInteractingRow2.current) {
+        const el = row2Ref.current
+        const oneThird = el.scrollWidth / 3
+        el.scrollLeft -= speed
+        if (el.scrollLeft <= oneThird) {
+          el.scrollLeft += oneThird
+        }
+      }
+
+      animationFrameId = requestAnimationFrame(updateScroll)
+    }
+
+    // Set initial scroll offsets to the center set to allow infinite scroll both ways
+    const initTimer = setTimeout(() => {
+      if (row1Ref.current) {
+        const el = row1Ref.current
+        el.scrollLeft = el.scrollWidth / 3
+      }
+      if (row2Ref.current) {
+        const el = row2Ref.current
+        el.scrollLeft = el.scrollWidth / 3
+      }
+    }, 200)
+
+    animationFrameId = requestAnimationFrame(updateScroll)
+
+    return () => {
+      clearTimeout(initTimer)
+      cancelAnimationFrame(animationFrameId)
+    }
+  }, [])
+
+  // Unified high-performance drag-to-scroll handler
+  const handleDragStart = (
+    rowRef: React.RefObject<HTMLDivElement | null>,
+    dragStartRef: React.MutableRefObject<{ x: number; scrollLeft: number }>,
+    interactingRef: React.MutableRefObject<boolean>
+  ) => (e: React.MouseEvent) => {
+    const el = rowRef.current
+    if (!el) return
+
+    interactingRef.current = true
+    isDraggingActive.current = false
+
+    // Prevent browser default ghost image drag
+    e.preventDefault()
+
+    dragStartRef.current = {
+      x: e.clientX,
+      scrollLeft: el.scrollLeft
+    }
+
+    const handleDragMove = (moveEvent: MouseEvent) => {
+      const deltaX = moveEvent.clientX - dragStartRef.current.x
+      
+      // If moved more than 5px, flag as active drag to prevent opening lightbox
+      if (Math.abs(deltaX) > 5) {
+        isDraggingActive.current = true
+      }
+
+      el.scrollLeft = dragStartRef.current.scrollLeft - deltaX
+
+      // Seamless mathematical wrap during dragging
+      const oneThird = el.scrollWidth / 3
+      if (el.scrollLeft >= oneThird * 2) {
+        el.scrollLeft -= oneThird
+        dragStartRef.current.scrollLeft -= oneThird
+      } else if (el.scrollLeft <= oneThird) {
+        el.scrollLeft += oneThird
+        dragStartRef.current.scrollLeft += oneThird
+      }
+    }
+
+    const handleDragEnd = () => {
+      document.removeEventListener('mousemove', handleDragMove)
+      document.removeEventListener('mouseup', handleDragEnd)
+      
+      // Keep interacting = true for a tiny split second to prevent autoscroll jumping
+      setTimeout(() => {
+        interactingRef.current = false
+      }, 500)
+    }
+
+    document.addEventListener('mousemove', handleDragMove)
+    document.addEventListener('mouseup', handleDragEnd)
+  }
 
   return (
     <section className="min-h-screen bg-[#0a0a0a] relative overflow-y-auto max-h-screen scrollbar-thin portal-enter">
@@ -125,27 +239,55 @@ export default function EventsSection({ onBack, onHome }: EventsSectionProps) {
 
       {/* Row 1 - Left to Right */}
       <div className={`mb-4 overflow-hidden transition-all duration-1000 delay-300 ${isVisible ? 'opacity-100' : 'opacity-0'}`}>
-        <div className="scroll-gallery">
-          {[...galleryImages, ...galleryImages].map((image, index) => (
-            <GalleryCard 
-              key={`row1-${index}`} 
-              image={image} 
-              onClick={() => setSelectedImage(image)}
-            />
-          ))}
+        <div 
+          ref={row1Ref}
+          className="flex overflow-x-auto scrollbar-none cursor-grab active:cursor-grabbing select-none w-full"
+          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+          onMouseDown={handleDragStart(row1Ref, dragStart1, isInteractingRow1)}
+          onTouchStart={() => { isInteractingRow1.current = true }}
+          onTouchEnd={() => { setTimeout(() => { isInteractingRow1.current = false }, 1000) }}
+          onMouseEnter={() => { isInteractingRow1.current = true }}
+          onMouseLeave={() => { if (!isDraggingActive.current) isInteractingRow1.current = false }}
+        >
+          <div className="flex">
+            {[...galleryImages, ...galleryImages, ...galleryImages].map((image, index) => (
+              <GalleryCard 
+                key={`row1-${index}`} 
+                image={image} 
+                onClick={() => {
+                  if (isDraggingActive.current) return
+                  setSelectedImage(image)
+                }}
+              />
+            ))}
+          </div>
         </div>
       </div>
 
       {/* Row 2 - Right to Left */}
       <div className={`overflow-hidden transition-all duration-1000 delay-500 ${isVisible ? 'opacity-100' : 'opacity-0'}`}>
-        <div className="scroll-gallery-reverse">
-          {[...galleryImages.slice().reverse(), ...galleryImages.slice().reverse()].map((image, index) => (
-            <GalleryCard 
-              key={`row2-${index}`} 
-              image={image} 
-              onClick={() => setSelectedImage(image)}
-            />
-          ))}
+        <div 
+          ref={row2Ref}
+          className="flex overflow-x-auto scrollbar-none cursor-grab active:cursor-grabbing select-none w-full"
+          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+          onMouseDown={handleDragStart(row2Ref, dragStart2, isInteractingRow2)}
+          onTouchStart={() => { isInteractingRow2.current = true }}
+          onTouchEnd={() => { setTimeout(() => { isInteractingRow2.current = false }, 1000) }}
+          onMouseEnter={() => { isInteractingRow2.current = true }}
+          onMouseLeave={() => { if (!isDraggingActive.current) isInteractingRow2.current = false }}
+        >
+          <div className="flex">
+            {[...galleryImages.slice().reverse(), ...galleryImages.slice().reverse(), ...galleryImages.slice().reverse()].map((image, index) => (
+              <GalleryCard 
+                key={`row2-${index}`} 
+                image={image} 
+                onClick={() => {
+                  if (isDraggingActive.current) return
+                  setSelectedImage(image)
+                }}
+              />
+            ))}
+          </div>
         </div>
       </div>
 

@@ -24,54 +24,54 @@ interface Photo {
 const generatePhotos = (): Photo[] => {
   const photos: Photo[] = []
   const desktopPositions = [
-    { x: 5, y: 8, w: 140, h: 175 },     // Top-left corner (0)
-    { x: 18, y: 10, w: 135, h: 165 },   // Top-left-center (1)
-    { x: 6, y: 34, w: 130, h: 160 },    // Mid-left (2)
-    { x: 5, y: 58, w: 135, h: 165 },    // Lower-left (3)
-    { x: 15, y: 78, w: 140, h: 175 },   // Bottom-left-center (4)
-    { x: 30, y: 82, w: 125, h: 155 },   // Bottom-center-left (5)
-    { x: 86, y: 8, w: 140, h: 175 },     // Top-right corner (6)
-    { x: 72, y: 10, w: 135, h: 165 },   // Top-right-center (7)
-    { x: 85, y: 34, w: 130, h: 160 },    // Mid-right (8)
-    { x: 86, y: 58, w: 135, h: 165 },    // Lower-right (9)
-    { x: 74, y: 78, w: 140, h: 175 },   // Bottom-right-center (10)
-    { x: 58, y: 82, w: 125, h: 155 },   // Bottom-center-right (11)
+    { x: 3, y: 6, w: 140, h: 175 },     // Col 1, Row 1 (0)
+    { x: 16, y: 14, w: 135, h: 165 },   // Col 2, Row 1 (1)
+    { x: 3, y: 38, w: 130, h: 160 },    // Col 1, Row 2 (2)
+    { x: 3, y: 70, w: 135, h: 165 },    // Col 1, Row 3 (3)
+    { x: 16, y: 46, w: 140, h: 175 },   // Col 2, Row 2 (4)
+    { x: 16, y: 76, w: 125, h: 155 },   // Col 2, Row 3 (5)
+    { x: 83, y: 6, w: 140, h: 175 },    // Col 4, Row 1 (6)
+    { x: 70, y: 14, w: 135, h: 165 },   // Col 3, Row 1 (7)
+    { x: 83, y: 38, w: 130, h: 160 },   // Col 4, Row 2 (8)
+    { x: 83, y: 70, w: 135, h: 165 },   // Col 4, Row 3 (9)
+    { x: 70, y: 46, w: 140, h: 175 },   // Col 3, Row 2 (10)
+    { x: 70, y: 76, w: 125, h: 155 },   // Col 3, Row 3 (11)
   ]
 
   const tabletPositions = [
-    { x: 6, y: 8, w: 130, h: 160 },     // Top-left corner
-    { x: 6, y: 44, w: 125, h: 155 },    // Mid-left
-    { x: 6, y: 78, w: 130, h: 160 },    // Bottom-left corner
-    { x: 85, y: 8, w: 130, h: 160 },     // Top-right corner
-    { x: 85, y: 44, w: 125, h: 155 },    // Mid-right
-    { x: 85, y: 78, w: 130, h: 160 },    // Bottom-right corner
-    { x: 28, y: 8, w: 120, h: 150 },    // Top-center-left
-    { x: 64, y: 8, w: 120, h: 150 },    // Top-center-right
+    { x: 4, y: 10, w: 130, h: 160 },    // Left Col 1, Row 1
+    { x: 18, y: 28, w: 125, h: 155 },   // Left Col 2, Row 1
+    { x: 4, y: 55, w: 130, h: 160 },    // Left Col 1, Row 2
+    { x: 18, y: 73, w: 130, h: 160 },   // Left Col 2, Row 2
+    { x: 82, y: 10, w: 130, h: 160 },   // Right Col 4, Row 1
+    { x: 68, y: 28, w: 125, h: 155 },   // Right Col 3, Row 1
+    { x: 82, y: 55, w: 130, h: 160 },   // Right Col 4, Row 2
+    { x: 68, y: 73, w: 130, h: 160 },   // Right Col 3, Row 2
     // Fallbacks
-    { x: 6, y: 8, w: 130, h: 160 },
-    { x: 85, y: 8, w: 130, h: 160 },
-    { x: 6, y: 78, w: 130, h: 160 },
-    { x: 85, y: 78, w: 130, h: 160 },
+    { x: 4, y: 10, w: 130, h: 160 },
+    { x: 82, y: 10, w: 130, h: 160 },
+    { x: 4, y: 55, w: 130, h: 160 },
+    { x: 82, y: 55, w: 130, h: 160 },
   ]
 
   const mobilePositions = [
-    { x: 6, y: 10, w: 110, h: 135 },    // Top-left corner
-    { x: 84, y: 10, w: 110, h: 135 },   // Top-right corner
-    { x: 6, y: 84, w: 110, h: 135 },    // Bottom-left corner
-    { x: 84, y: 84, w: 110, h: 135 },   // Bottom-right corner
+    { x: 4, y: 15, w: 110, h: 135 },    // Left Col 1, Row 1
+    { x: 76, y: 15, w: 110, h: 135 },   // Right Col 2, Row 1
+    { x: 4, y: 60, w: 110, h: 135 },    // Left Col 1, Row 2
+    { x: 76, y: 60, w: 110, h: 135 },   // Right Col 2, Row 2
     // Fallbacks
-    { x: 6, y: 10, w: 110, h: 135 },
-    { x: 84, y: 10, w: 110, h: 135 },
-    { x: 6, y: 84, w: 110, h: 135 },
-    { x: 84, y: 84, w: 110, h: 135 },
-    { x: 6, y: 10, w: 110, h: 135 },
-    { x: 84, y: 10, w: 110, h: 135 },
-    { x: 6, y: 84, w: 110, h: 135 },
-    { x: 84, y: 84, w: 110, h: 135 },
+    { x: 4, y: 15, w: 110, h: 135 },
+    { x: 76, y: 15, w: 110, h: 135 },
+    { x: 4, y: 60, w: 110, h: 135 },
+    { x: 76, y: 60, w: 110, h: 135 },
+    { x: 4, y: 15, w: 110, h: 135 },
+    { x: 76, y: 15, w: 110, h: 135 },
+    { x: 4, y: 60, w: 110, h: 135 },
+    { x: 76, y: 60, w: 110, h: 135 },
   ]
 
   const labels = [
-    'HACKATHON 2024', 'WORKSHOP', 'TEAM BUILD', 'CODE NIGHT',
+    'HACKATHON 2026', 'WORKSHOP', 'TEAM BUILD', 'CODE NIGHT',
     'AI SUMMIT', 'ROBOTICS', 'NEURAL NET', 'TECH TALK',
     'IDEATION', 'PROTOTYPE', 'DEMO DAY', 'LAUNCH'
   ]
@@ -104,11 +104,17 @@ export default function LandingHero({ onEnter, onScrollDown, isMuted = false, on
   const [isReady, setIsReady] = useState(false)
   const [hoveredPhoto, setHoveredPhoto] = useState<number | null>(null)
   const [isDragging, setIsDragging] = useState(false)
-  const [dragStart, setDragStart] = useState({ x: 0, y: 0 })
   const [photoOffsets, setPhotoOffsets] = useState<{[key: number]: {x: number, y: number}}>({})
   const [breakpoint, setBreakpoint] = useState<'mobile' | 'tablet' | 'desktop'>('desktop')
 
   const touchStartY = useRef(0)
+  
+  // High-performance drag references to bypass React re-renders on mousemove
+  const draggedPhotoIdRef = useRef<number | null>(null)
+  const draggedElementRef = useRef<HTMLElement | null>(null)
+  const dragStartRef = useRef({ x: 0, y: 0 })
+  const dragStartOffsetRef = useRef({ x: 0, y: 0 })
+  const photoOffsetsRef = useRef<{[key: number]: {x: number, y: number}}>({})
 
   useEffect(() => {
     setPhotos(generatePhotos())
@@ -176,32 +182,55 @@ export default function LandingHero({ onEnter, onScrollDown, isMuted = false, on
     }
   }, [onScrollDown])
 
-  const handlePhotoMouseDown = (photoId: number) => (e: React.MouseEvent) => {
+  const handlePhotoMouseDown = (photoId: number) => (e: React.MouseEvent<HTMLDivElement>) => {
     setIsDragging(true)
-    setDragStart({ x: e.clientX, y: e.clientY })
+    draggedPhotoIdRef.current = photoId
+    draggedElementRef.current = e.currentTarget
+    dragStartRef.current = { x: e.clientX, y: e.clientY }
+    
+    const currentOffset = photoOffsets[photoId] || { x: 0, y: 0 }
+    dragStartOffsetRef.current = currentOffset
+    
+    // Sync current offset to ref map
+    photoOffsetsRef.current[photoId] = currentOffset
   }
 
   useEffect(() => {
     if (!isDragging) return
 
     const handleMouseMove = (e: MouseEvent) => {
-      const deltaX = e.clientX - dragStart.x
-      const deltaY = e.clientY - dragStart.y
+      const activeId = draggedPhotoIdRef.current
+      const element = draggedElementRef.current
+      if (activeId === null || !element) return
 
-      if (hoveredPhoto !== null) {
-        setPhotoOffsets(prev => ({
-          ...prev,
-          [hoveredPhoto]: {
-            x: (prev[hoveredPhoto]?.x || 0) + deltaX * 0.5,
-            y: (prev[hoveredPhoto]?.y || 0) + deltaY * 0.5,
-          }
-        }))
-        setDragStart({ x: e.clientX, y: e.clientY })
-      }
+      const deltaX = e.clientX - dragStartRef.current.x
+      const deltaY = e.clientY - dragStartRef.current.y
+
+      const newX = dragStartOffsetRef.current.x + deltaX * 0.5
+      const newY = dragStartOffsetRef.current.y + deltaY * 0.5
+
+      photoOffsetsRef.current[activeId] = { x: newX, y: newY }
+
+      const photo = photos.find(p => p.id === activeId)
+      const rotate = photo ? photo.rotate : 0
+
+      // Hardware accelerated translation
+      element.style.transform = `rotate(${rotate}deg) scale(1.1) translate(${newX}px, ${newY}px)`
     }
 
     const handleMouseUp = () => {
       setIsDragging(false)
+      const activeId = draggedPhotoIdRef.current
+      if (activeId !== null) {
+        // Sync final values back to React state exactly once
+        const finalOffset = photoOffsetsRef.current[activeId] || { x: 0, y: 0 }
+        setPhotoOffsets(prev => ({
+          ...prev,
+          [activeId]: finalOffset
+        }))
+      }
+      draggedPhotoIdRef.current = null
+      draggedElementRef.current = null
     }
 
     document.addEventListener('mousemove', handleMouseMove)
@@ -211,16 +240,17 @@ export default function LandingHero({ onEnter, onScrollDown, isMuted = false, on
       document.removeEventListener('mousemove', handleMouseMove)
       document.removeEventListener('mouseup', handleMouseUp)
     }
-  }, [isDragging, dragStart, hoveredPhoto])
+  }, [isDragging, photos])
 
   return (
-    <div className="relative min-h-screen w-full overflow-hidden bg-[#0a0a0a]">
+    <div className="relative h-screen w-full overflow-hidden bg-[#0a0a0a]">
       {/* Grunge overlay */}
       <div className="grunge-overlay" />
       
-      {/* Scattered Photos Background */}
-      <div className="absolute inset-0">
-        {photos.map((photo) => {
+      {/* Scattered Photos Centered Max-Width Container */}
+      <div className="absolute inset-y-0 left-1/2 -translate-x-1/2 w-full max-w-[1440px] pointer-events-none">
+        <div className="relative w-full h-full pointer-events-auto">
+          {photos.map((photo) => {
           // Responsive layout filtration to prevent mobile/tablet clutter
           if (breakpoint === 'mobile' && photo.id >= 4) return null
           if (breakpoint === 'tablet' && photo.id >= 8) return null
@@ -299,6 +329,7 @@ export default function LandingHero({ onEnter, onScrollDown, isMuted = false, on
             </div>
           )
         })}
+        </div>
       </div>
 
       {/* Center Content */}
@@ -330,7 +361,7 @@ export default function LandingHero({ onEnter, onScrollDown, isMuted = false, on
             A Society of Minds Building Tomorrow
           </p>
           <p className="font-mono text-[10px] text-[#6b6b6b] tracking-[0.3em] mb-12">
-            JIIT NOIDA // EST. 2020
+            JIIT NOIDA // EST. 2026
           </p>
 
           {/* Enter Button */}
@@ -357,11 +388,9 @@ export default function LandingHero({ onEnter, onScrollDown, isMuted = false, on
             <p className="font-mono text-[10px] text-[#6b6b6b] tracking-[0.2em] mb-2 uppercase">
               Scroll or Click to Enter Menu
             </p>
-            <div className="flex justify-center gap-1">
-              <span className="w-1 h-1 bg-[#6b6b6b] rounded-full animate-pulse" />
-              <span className="w-1 h-1 bg-[#6b6b6b] rounded-full animate-pulse" style={{ animationDelay: '0.2s' }} />
-              <span className="w-1 h-1 bg-[#6b6b6b] rounded-full animate-pulse" style={{ animationDelay: '0.4s' }} />
-            </div>
+            <p className="funky-credit text-[13px] uppercase tracking-[0.15em] mt-1">
+              // DESIGNED & ENGINEERED BY SHIVAM SHARMA ~ shivi
+            </p>
           </div>
         </div>
       </div>
@@ -372,7 +401,7 @@ export default function LandingHero({ onEnter, onScrollDown, isMuted = false, on
           className="font-mono text-xs text-[#6b6b6b] tracking-[0.3em]"
           style={{ writingMode: 'vertical-rl', textOrientation: 'mixed' }}
         >
-          AI-TRONICS 2024
+          AI-TRONICS 2026
         </span>
       </div>
 
@@ -396,7 +425,7 @@ export default function LandingHero({ onEnter, onScrollDown, isMuted = false, on
       <div className="absolute bottom-6 left-6 z-50">
         <div className="font-mono text-xs text-[#6b6b6b] leading-relaxed tracking-wider">
           <p>AI-TRONICS</p>
-          <p>2024</p>
+          <p>2026</p>
           <p>JIIT NOIDA</p>
         </div>
       </div>

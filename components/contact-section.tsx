@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Github, Instagram, Linkedin } from 'lucide-react'
+import { Instagram, Linkedin, Mail, Facebook } from 'lucide-react'
 
 interface ContactSectionProps {
   onBack: () => void
@@ -10,35 +10,11 @@ interface ContactSectionProps {
 
 export default function ContactSection({ onBack, onHome }: ContactSectionProps) {
   const [isVisible, setIsVisible] = useState(false)
-  const [formState, setFormState] = useState({
-    name: '',
-    email: '',
-    message: '',
-  })
-  const [isSubmitted, setIsSubmitted] = useState(false)
-  const [isTyping, setIsTyping] = useState(false)
 
   useEffect(() => {
     const timer = setTimeout(() => setIsVisible(true), 100)
     return () => clearTimeout(timer)
   }, [])
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsTyping(true)
-    
-    setTimeout(() => {
-      setIsTyping(false)
-      setIsSubmitted(true)
-    }, 1500)
-  }
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setFormState(prev => ({
-      ...prev,
-      [e.target.name]: e.target.value
-    }))
-  }
 
   return (
     <section className="min-h-screen bg-[#0a0a0a] relative overflow-y-auto max-h-screen scrollbar-thin portal-enter flex flex-col justify-center">
@@ -69,151 +45,103 @@ export default function ContactSection({ onBack, onHome }: ContactSectionProps) 
           {/* Section Header */}
           <div className={`mb-16 text-center transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
             <p className="font-mono text-xs text-[#6b6b6b] tracking-[0.4em] mb-4 uppercase">
-              05 / Transmit
+              05 / Contact Us
             </p>
             <h2 
               className="glitch-rgb text-5xl md:text-7xl lg:text-8xl text-[#f5f5dc] tracking-tight drip-text"
-              data-text="THINK YOU BELONG HERE?"
+              data-text="GET IN TOUCH"
               style={{ fontFamily: 'Bebas Neue, Impact, sans-serif' }}
             >
-              THINK YOU BELONG HERE?
+              GET IN TOUCH
               <span className="drip" />
               <span className="drip" />
               <span className="drip" />
             </h2>
           </div>
 
-          {!isSubmitted ? (
-            <form 
-              onSubmit={handleSubmit} 
-              className={`space-y-8 transition-all duration-1000 delay-300 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
-            >
-              {/* Name Field */}
-              <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4">
-                <span className="font-mono text-xs text-[#a8a29e] tracking-wider">
-                  {'>'} NAME:
-                </span>
-                <input
-                  type="text"
-                  name="name"
-                  value={formState.name}
-                  onChange={handleInputChange}
-                  required
-                  className="terminal-input flex-1 text-sm"
-                  placeholder="ENTER YOUR DESIGNATION"
-                />
-              </div>
-
-              {/* Email Field */}
-              <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4">
-                <span className="font-mono text-xs text-[#a8a29e] tracking-wider">
-                  {'>'} EMAIL:
-                </span>
-                <input
-                  type="email"
-                  name="email"
-                  value={formState.email}
-                  onChange={handleInputChange}
-                  required
-                  className="terminal-input flex-1 text-sm"
-                  placeholder="YOUR_CONTACT@DOMAIN.COM"
-                />
-              </div>
-
-              {/* Message Field */}
-              <div className="flex flex-col md:flex-row md:items-start gap-2 md:gap-4">
-                <span className="font-mono text-xs text-[#a8a29e] pt-0 md:pt-3 tracking-wider">
-                  {'>'} WHY AI-TRONICS?:
-                </span>
-                <textarea
-                  name="message"
-                  value={formState.message}
-                  onChange={handleInputChange}
-                  required
-                  rows={4}
-                  className="terminal-input flex-1 resize-none text-sm"
-                  placeholder="STATE YOUR PURPOSE..."
-                />
-              </div>
-
-              {/* Submit Button */}
-              <div className="flex justify-center pt-8">
-                <button 
-                  type="submit" 
-                  className="group relative px-12 py-4 border border-[#f5f5dc]/30 bg-transparent overflow-hidden transition-all duration-500 hover:border-[#f5f5dc]/60"
-                >
-                  <span className="absolute inset-0 bg-[#f5f5dc] transform -translate-x-full group-hover:translate-x-0 transition-transform duration-500 ease-out" />
-                  <span 
-                    className="relative font-mono text-sm tracking-[0.3em] text-[#f5f5dc] group-hover:text-[#0a0a0a] transition-colors duration-300"
-                    style={{ fontFamily: 'Bebas Neue, Impact, sans-serif', fontSize: '1.1rem' }}
-                  >
-                    [ TRANSMIT ]
-                  </span>
-                </button>
-              </div>
-            </form>
-          ) : (
-            <div className={`text-center transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-              <div className="font-mono text-sm text-[#a8a29e] space-y-3">
-                <p>{'>'} PROCESSING...</p>
-                <p>{'>'} REQUEST RECEIVED.</p>
-                <p className="text-[#f5f5dc]">{'>'} WE&apos;LL FIND YOU.</p>
-              </div>
-              <button 
-                onClick={() => {
-                  setIsSubmitted(false)
-                  setFormState({ name: '', email: '', message: '' })
-                }}
-                className="mt-8 font-mono text-xs text-[#6b6b6b] hover:text-[#f5f5dc] transition-colors tracking-wider"
-              >
-                [ SEND ANOTHER ]
-              </button>
-            </div>
-          )}
-
-          {isTyping && (
-            <div className="mt-8 text-center">
-              <span className="font-mono text-sm text-[#a8a29e] animate-pulse tracking-wider">
-                {'>'} TRANSMITTING
-                <span className="inline-block animate-bounce">.</span>
-                <span className="inline-block animate-bounce" style={{ animationDelay: '0.1s' }}>.</span>
-                <span className="inline-block animate-bounce" style={{ animationDelay: '0.2s' }}>.</span>
-              </span>
-            </div>
-          )}
-
-          {/* Social Links */}
-          <div className={`flex justify-center gap-6 mt-20 transition-all duration-1000 delay-500 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-            <a 
-              href="https://github.com" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="glass-card p-4 text-[#6b6b6b] hover:text-[#f5f5dc] hover:border-[#f5f5dc]/30 transition-all"
-            >
-              <Github size={22} />
-            </a>
+          {/* Cybernetic Direct Links Grid */}
+          <div className={`grid grid-cols-1 sm:grid-cols-2 gap-6 transition-all duration-1000 delay-300 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+            
+            {/* INSTAGRAM */}
             <a 
               href="https://instagram.com" 
               target="_blank" 
               rel="noopener noreferrer"
-              className="glass-card p-4 text-[#6b6b6b] hover:text-[#f5f5dc] hover:border-[#f5f5dc]/30 transition-all"
+              className="group relative flex items-center justify-between p-6 border border-[#f5f5dc]/10 bg-black/40 hover:bg-black/60 hover:border-[#f5f5dc]/30 transition-all duration-300 hover:-translate-y-1 shadow-lg hover:shadow-[#00f0ff]/5 cursor-pointer"
             >
-              <Instagram size={22} />
+              <div className="flex items-center gap-4">
+                <div className="p-3 bg-black/60 border border-[#f5f5dc]/10 group-hover:border-[#00f0ff]/40 text-[#a8a29e] group-hover:text-[#00f0ff] transition-colors rounded-md">
+                  <Instagram size={24} />
+                </div>
+                <div>
+                  <h3 className="font-mono text-sm text-[#f5f5dc] tracking-wider uppercase">// INSTAGRAM</h3>
+                  <p className="font-mono text-[10px] text-[#6b6b6b] tracking-wider mt-0.5">FOLLOW OUR FEED</p>
+                </div>
+              </div>
+              <span className="font-mono text-xs text-[#6b6b6b] group-hover:text-[#00f0ff] transition-colors">CONNECT →</span>
             </a>
+
+            {/* EMAIL */}
+            <a 
+              href="mailto:contact@ai-tronics.com" 
+              className="group relative flex items-center justify-between p-6 border border-[#f5f5dc]/10 bg-black/40 hover:bg-black/60 hover:border-[#f5f5dc]/30 transition-all duration-300 hover:-translate-y-1 shadow-lg hover:shadow-[#ff007f]/5 cursor-pointer"
+            >
+              <div className="flex items-center gap-4">
+                <div className="p-3 bg-black/60 border border-[#f5f5dc]/10 group-hover:border-[#ff007f]/40 text-[#a8a29e] group-hover:text-[#ff007f] transition-colors rounded-md">
+                  <Mail size={24} />
+                </div>
+                <div>
+                  <h3 className="font-mono text-sm text-[#f5f5dc] tracking-wider uppercase">// EMAIL</h3>
+                  <p className="font-mono text-[10px] text-[#6b6b6b] tracking-wider mt-0.5">DIRECT ENQUIRIES</p>
+                </div>
+              </div>
+              <span className="font-mono text-xs text-[#6b6b6b] group-hover:text-[#ff007f] transition-colors">TRANSMIT →</span>
+            </a>
+
+            {/* LINKEDIN */}
             <a 
               href="https://linkedin.com" 
               target="_blank" 
               rel="noopener noreferrer"
-              className="glass-card p-4 text-[#6b6b6b] hover:text-[#f5f5dc] hover:border-[#f5f5dc]/30 transition-all"
+              className="group relative flex items-center justify-between p-6 border border-[#f5f5dc]/10 bg-black/40 hover:bg-black/60 hover:border-[#f5f5dc]/30 transition-all duration-300 hover:-translate-y-1 shadow-lg hover:shadow-[#00f0ff]/5 cursor-pointer"
             >
-              <Linkedin size={22} />
+              <div className="flex items-center gap-4">
+                <div className="p-3 bg-black/60 border border-[#f5f5dc]/10 group-hover:border-[#00f0ff]/40 text-[#a8a29e] group-hover:text-[#00f0ff] transition-colors rounded-md">
+                  <Linkedin size={24} />
+                </div>
+                <div>
+                  <h3 className="font-mono text-sm text-[#f5f5dc] tracking-wider uppercase">// LINKEDIN</h3>
+                  <p className="font-mono text-[10px] text-[#6b6b6b] tracking-wider mt-0.5">PROFESSIONAL NETWORK</p>
+                </div>
+              </div>
+              <span className="font-mono text-xs text-[#6b6b6b] group-hover:text-[#00f0ff] transition-colors">CONNECT →</span>
             </a>
+
+            {/* FACEBOOK */}
+            <a 
+              href="https://facebook.com" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="group relative flex items-center justify-between p-6 border border-[#f5f5dc]/10 bg-black/40 hover:bg-black/60 hover:border-[#f5f5dc]/30 transition-all duration-300 hover:-translate-y-1 shadow-lg hover:shadow-[#ff007f]/5 cursor-pointer"
+            >
+              <div className="flex items-center gap-4">
+                <div className="p-3 bg-black/60 border border-[#f5f5dc]/10 group-hover:border-[#ff007f]/40 text-[#a8a29e] group-hover:text-[#ff007f] transition-colors rounded-md">
+                  <Facebook size={24} />
+                </div>
+                <div>
+                  <h3 className="font-mono text-sm text-[#f5f5dc] tracking-wider uppercase">// FACEBOOK</h3>
+                  <p className="font-mono text-[10px] text-[#6b6b6b] tracking-wider mt-0.5">COMMUNITY NETWORK</p>
+                </div>
+              </div>
+              <span className="font-mono text-xs text-[#6b6b6b] group-hover:text-[#ff007f] transition-colors">CONNECT →</span>
+            </a>
+
           </div>
 
           {/* Footer Info */}
-          <div className={`mt-20 text-center transition-all duration-1000 delay-700 ${isVisible ? 'opacity-100' : 'opacity-0'}`}>
+          <div className={`mt-24 text-center transition-all duration-1000 delay-500 ${isVisible ? 'opacity-100' : 'opacity-0'}`}>
             <p className="font-mono text-[10px] text-[#3a3a3a] tracking-[0.3em]">
-              AI-TRONICS HUB // JIIT NOIDA // EST. 2020
+              AI-TRONICS HUB // JIIT NOIDA // EST. 2026
             </p>
           </div>
         </div>

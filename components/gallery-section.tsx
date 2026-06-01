@@ -15,7 +15,7 @@ interface GalleryImage {
 }
 
 const galleryImages: GalleryImage[] = [
-  { src: 'https://picsum.photos/seed/gallery1/600/400?grayscale', title: 'HACKATHON 2024', date: 'MAR 15' },
+  { src: 'https://picsum.photos/seed/gallery1/600/400?grayscale', title: 'HACKATHON 2026', date: 'MAR 15' },
   { src: 'https://picsum.photos/seed/gallery2/600/400?grayscale', title: 'AI WORKSHOP', date: 'FEB 28' },
   { src: 'https://picsum.photos/seed/gallery3/600/400?grayscale', title: 'ROBOTICS DEMO', date: 'JAN 20' },
   { src: 'https://picsum.photos/seed/gallery4/600/400?grayscale', title: 'NEURAL NETS 101', date: 'DEC 10' },

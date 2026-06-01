@@ -15,7 +15,7 @@ const sections: Section[] = [
   { id: 'about', label: 'THE HUB', sublabel: 'About AI-TRONICS', number: '02' },
   { id: 'events', label: 'ARCHIVES', sublabel: 'Events & Memories', number: '03' },
   { id: 'vibe', label: 'NOW PLAYING', sublabel: 'Set Your Frequency', number: '04' },
-  { id: 'contact', label: 'TRANSMIT', sublabel: 'Get In Touch', number: '05' },
+  { id: 'contact', label: 'CONTACT US', sublabel: 'Get In Touch', number: '05' },
   { id: 'infinite-gallery', label: 'INFINITE', sublabel: 'Infinite Archive Experience', number: '06' },
 ]
 
@@ -193,8 +193,9 @@ export default function SectionMenu({ isOpen, onClose, onSelectSection, currentS
             <div className="font-mono text-[10px] text-[#6b6b6b] tracking-wider leading-relaxed">
               <p>AI-TRONICS HUB</p>
               <p>JIIT NOIDA</p>
-              <p>EST. 2020</p>
+              <p>EST. 2026</p>
             </div>
+
             <div className="font-mono text-[10px] text-[#6b6b6b] tracking-wider text-right">
               <p>SELECT A SECTION</p>
               <p>TO EXPLORE</p>

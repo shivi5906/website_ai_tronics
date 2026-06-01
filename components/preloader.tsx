@@ -5,24 +5,95 @@ import { useEffect, useState } from 'react'
 export default function Preloader({ onComplete }: { onComplete: () => void }) {
   const [progress, setProgress] = useState(0)
   const [visible, setVisible] = useState(true)
+  const [statusText, setStatusText] = useState('Initializing Neural Systems')
 
   useEffect(() => {
+    // 1. Compile all assets to preload
+    const landingImages = Array.from({ length: 12 }, (_, i) => `/gallery/landing/photo${i}.jpg`)
+    const galleryImages = Array.from({ length: 46 }, (_, i) => `/gallery/infinite/m${i + 1}.jpg`)
+    const allImages = [...landingImages, ...galleryImages]
+    const audioAsset = '/audio/industry_baby.mp3'
+
+    const totalAssets = allImages.length + 1 // Images + Audio
+    let loadedCount = 0
+    let displayPercent = 0
+
+    // Smooth visual progress accumulator interval to prevent flash/instant fade out
     const progressInterval = setInterval(() => {
-      setProgress(prev => {
-        if (prev >= 100) {
-          clearInterval(progressInterval)
-          setTimeout(() => {
-            setVisible(false)
-            onComplete()
-          }, 400)
-          return 100
+      const targetPercent = (loadedCount / totalAssets) * 100
+      
+      if (displayPercent < targetPercent) {
+        // Slide smoothly towards target loaded percentage
+        displayPercent += Math.min(2.5, targetPercent - displayPercent)
+      } else if (displayPercent < 100 && loadedCount >= totalAssets) {
+        // Smoothly trickle to completion when everything is finished
+        displayPercent += 2.0
+      }
+
+      const clampedPercent = Math.min(100, displayPercent)
+      setProgress(clampedPercent)
+
+      if (loadedCount <= 12) {
+        setStatusText(`Loading Core Interface: ${loadedCount}/12`)
+      } else if (loadedCount < totalAssets) {
+        setStatusText(`Preloading Neural Archives: ${loadedCount - 12}/46`)
+      } else {
+        setStatusText('Tuning Frequency... Systems Ready.')
+      }
+
+      if (clampedPercent >= 100 && loadedCount >= totalAssets) {
+        clearInterval(progressInterval)
+        clearTimeout(fallbackTimeout)
+        setTimeout(() => {
+          setVisible(false)
+          onComplete()
+        }, 500)
+      }
+    }, 25)
+
+    // Defensive fallback timeout: force load complete after 8 seconds under any extreme network issues
+    const fallbackTimeout = setTimeout(() => {
+      clearInterval(progressInterval)
+      setProgress(100)
+      setStatusText('Systems Ready.')
+      setTimeout(() => {
+        setVisible(false)
+        onComplete()
+      }, 500)
+    }, 8000)
+
+    if (typeof window !== 'undefined') {
+      (window as any).preloadedImageElements = (window as any).preloadedImageElements || {}
+    }
+
+    const handleAssetLoad = () => {
+      loadedCount++
+    }
+
+    // 2. Load all images programmatically
+    allImages.forEach((src) => {
+      const img = new Image()
+      img.crossOrigin = 'anonymous'
+      img.onload = () => {
+        if (typeof window !== 'undefined') {
+          (window as any).preloadedImageElements[src] = img
         }
-        return prev + 1.5
-      })
-    }, 35)
+        handleAssetLoad()
+      }
+      img.onerror = handleAssetLoad // Bypass error so it never gets stuck
+      img.src = src
+    })
+
+    // 3. Load audio file programmatically
+    const audio = new Audio()
+    audio.src = audioAsset
+    audio.preload = 'auto'
+    audio.addEventListener('canplaythrough', handleAssetLoad, { once: true })
+    audio.addEventListener('error', handleAssetLoad, { once: true }) // Bypass error
 
     return () => {
       clearInterval(progressInterval)
+      clearTimeout(fallbackTimeout)
     }
   }, [onComplete])
 
@@ -79,8 +150,8 @@ export default function Preloader({ onComplete }: { onComplete: () => void }) {
           </div>
         </div>
 
-        <p className="font-mono text-xs text-[#6b6b6b] mt-6 tracking-[0.4em] uppercase">
-          Initializing
+        <p className="font-mono text-xs text-[#6b6b6b] mt-6 tracking-[0.2em] uppercase">
+          {statusText}
         </p>
         
         <div className="loading-bar mt-8 mx-auto">

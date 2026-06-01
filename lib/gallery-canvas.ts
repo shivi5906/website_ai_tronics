@@ -25,6 +25,39 @@ interface WebGLCardTexture {
   z: number
 }
 
+function resizeImageToCanvas(img: HTMLImageElement, maxDim: number): HTMLCanvasElement | HTMLImageElement {
+  const w = img.naturalWidth || img.width
+  const h = img.naturalHeight || img.height
+  if (!w || !h) return img
+  if (w <= maxDim && h <= maxDim) {
+    return img
+  }
+  const canvas = document.createElement('canvas')
+  let targetW = w
+  let targetH = h
+  if (w > h) {
+    if (w > maxDim) {
+      targetH = Math.round((h * maxDim) / w)
+      targetW = maxDim
+    }
+  } else {
+    if (h > maxDim) {
+      targetW = Math.round((w * maxDim) / h)
+      targetH = maxDim
+    }
+  }
+  canvas.width = targetW
+  canvas.height = targetH
+  const ctx = canvas.getContext('2d')
+  if (ctx) {
+    ctx.imageSmoothingEnabled = true
+    ctx.imageSmoothingQuality = 'high'
+    ctx.drawImage(img, 0, 0, targetW, targetH)
+    return canvas
+  }
+  return img
+}
+
 export class GalleryCanvas {
   private container: HTMLElement
   private cardConfigs: GalleryCardConfig[]
@@ -60,12 +93,12 @@ export class GalleryCanvas {
 
   // Inertia and friction constants
   private readonly FRICTION = 0.95 // High-quality smooth inertia decay
-  private readonly DRAG_SENSITIVITY = 1.8 // Panning drag sensitivity
-  private readonly SCROLL_SENSITIVITY = 0.45 // Scroll-depth flying speed
+  private readonly DRAG_SENSITIVITY = 1.2 // Panning drag sensitivity
+  private readonly SCROLL_SENSITIVITY = 0.22 // Scroll-depth flying speed
 
   // Endless 3D tunnel parameters
-  private readonly TOTAL_DEPTH = 3200 // Endless Z-tunnel length
-  private readonly WRAP_PADDING = 200 // Z-wrapping buffer
+  private readonly TOTAL_DEPTH = 5400 // Endless Z-tunnel length (expanded from 3200)
+  private readonly WRAP_PADDING = 300 // Z-wrapping buffer (expanded from 200)
 
   // Drag and touch state
   private isDragging = false
@@ -75,6 +108,7 @@ export class GalleryCanvas {
   private dragStartCamY = 0
 
   private active = false
+  private isRendering = false
   private animationFrameId: number | null = null
 
   // Card items preloaded
@@ -117,6 +151,7 @@ export class GalleryCanvas {
     // 1. Setup Canvas Element
     this.canvas = document.createElement('canvas')
     this.canvas.className = 'w-full h-full block'
+    this.canvas.style.touchAction = 'none'
     this.container.innerHTML = ''
     this.container.appendChild(this.canvas)
 
@@ -130,6 +165,18 @@ export class GalleryCanvas {
       return
     }
     this.gl = gl
+
+    // Handle WebGL Context Loss and recovery
+    this.canvas.addEventListener('webglcontextlost', (e: Event) => {
+      e.preventDefault()
+      console.warn('WebGL context lost. Halting rendering loop.')
+      this.handleContextLost()
+    }, false)
+
+    this.canvas.addEventListener('webglcontextrestored', () => {
+      console.log('WebGL context restored. Rebuilding shaders and textures.')
+      this.handleContextRestored()
+    }, false)
 
     // Set viewport dimensions
     this.resizeCanvas()
@@ -148,12 +195,12 @@ export class GalleryCanvas {
     this.canvas.addEventListener('mousedown', this.boundOnMouseDown)
     window.addEventListener('mousemove', this.boundOnMouseMove)
     window.addEventListener('mouseup', this.boundOnMouseUp)
-    this.canvas.addEventListener('wheel', this.boundOnWheel, { passive: false })
+    this.canvas.addEventListener('wheel', this.boundOnWheel, { passive: true })
 
     // Touch events for mobile compatibility
-    this.canvas.addEventListener('touchstart', this.boundOnTouchStart, { passive: false })
-    window.addEventListener('touchmove', this.boundOnTouchMove, { passive: false })
-    window.addEventListener('touchend', this.boundOnTouchEnd)
+    this.canvas.addEventListener('touchstart', this.boundOnTouchStart, { passive: true })
+    window.addEventListener('touchmove', this.boundOnTouchMove, { passive: true })
+    window.addEventListener('touchend', this.boundOnTouchEnd, { passive: true })
 
     window.addEventListener('resize', this.boundOnResize)
   }
@@ -187,12 +234,12 @@ export class GalleryCanvas {
         vUv = aUv;
         vec4 mvPosition = uModelViewMatrix * vec4(aPosition, 0.0, 1.0);
         
-        // Fluid bending wave distortion centered around movement velocities
-        float warp = sin(aPosition.x * 2.5 + uTime * 2.0) * uVelocity.y * 0.003;
+        // Fluid bending wave distortion centered around movement velocities (calmed down by 3x)
+        float warp = sin(aPosition.x * 2.5 + uTime * 2.0) * uVelocity.y * 0.001;
         mvPosition.y += warp * (mvPosition.x * 0.002);
         
-        // Horizontal shear skew proportional to travel speed
-        mvPosition.x += uVelocity.x * sin(mvPosition.y * 0.005) * 0.15;
+        // Horizontal shear skew proportional to travel speed (calmed down by ~4x)
+        mvPosition.x += uVelocity.x * sin(mvPosition.y * 0.005) * 0.04;
         
         gl_Position = uProjectionMatrix * mvPosition;
       }
@@ -206,8 +253,8 @@ export class GalleryCanvas {
       uniform vec2 uVelocity;
 
       void main() {
-        // Red channel offsets in travel direction, Blue channel offsets opposite
-        vec2 offset = uVelocity * 0.00045;
+        // Red channel offsets in travel direction, Blue channel offsets opposite (calmed down by 3x)
+        vec2 offset = uVelocity * 0.00015;
         
         float r = texture2D(uTexture, vUv + offset).r;
         float g = texture2D(uTexture, vUv).g;
@@ -296,19 +343,20 @@ export class GalleryCanvas {
     const gl = this.gl
     this.webglCards = []
 
-    const cardCount = 36 // Tiled count scattered in the 3D space
+    const cardCount = 46 // Tiled count scattered in the 3D space
     
     for (let i = 0; i < cardCount; i++) {
       const configIndex = i % this.cardConfigs.length
       const config = this.cardConfigs[configIndex]
 
-      // Scatter cards in a circular 3D corridor centered on camera path
-      // Spiral scattering along depth creates a gorgeous perspective tunnel!
-      const angle = (i / cardCount) * Math.PI * 8 // Concentric spirals
-      const radius = 350 + Math.random() * 850 // Distance from center
+      // Systematic circular cylinder warp tunnel layout
+      const angle = (i / cardCount) * Math.PI * 12 // 6 full systematic rotations around the Z axis
+      const radius = 780 // Perfect circular cylinder radius
       const x = Math.cos(angle) * radius
       const y = Math.sin(angle) * radius
-      const z = (i / cardCount) * this.TOTAL_DEPTH // Spaced evenly down the tunnel corridor
+
+      // Spaced cleanly and evenly along the Z depth tunnel
+      const z = (i / cardCount) * this.TOTAL_DEPTH
 
       const webglCard: WebGLCardTexture = {
         id: `${config.id}-${i}`,
@@ -324,41 +372,64 @@ export class GalleryCanvas {
 
       this.webglCards.push(webglCard)
 
-      // Preload image textures
-      const img = new Image()
-      img.crossOrigin = 'anonymous'
-      
-      img.onload = () => {
+      const uploadTexture = (imgElement: HTMLImageElement | HTMLCanvasElement) => {
         const texture = gl.createTexture()
         gl.bindTexture(gl.TEXTURE_2D, texture)
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
-        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img)
+        
+        // 98.4% VRAM downscaling reduction
+        const downscaled = imgElement instanceof HTMLImageElement ? resizeImageToCanvas(imgElement, 512) : imgElement
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, downscaled)
         webglCard.texture = texture
       }
 
-      img.onerror = () => {
-        const fallbackCanvas = document.createElement('canvas')
-        fallbackCanvas.width = 128
-        fallbackCanvas.height = 128
-        const ctx = fallbackCanvas.getContext('2d')
-        if (ctx) {
-          ctx.fillStyle = '#151515'
-          ctx.fillRect(0, 0, 128, 128)
-          ctx.fillStyle = '#f5f5dc'
-          ctx.font = 'bold 12px monospace'
-          ctx.fillText(config.title, 8, 60)
+      // Check if image is already cached globally in memory
+      const globalCache = (typeof window !== 'undefined') ? (window as any).preloadedImageElements : null
+      const preloadedImg = globalCache ? globalCache[config.imageUrl] : null
+
+      if (preloadedImg && preloadedImg.complete && preloadedImg.naturalWidth > 0) {
+        // Upload immediately from memory cache without network delay!
+        uploadTexture(preloadedImg)
+      } else {
+        // Fallback to loading it programmatically
+        const img = new Image()
+        img.crossOrigin = 'anonymous'
+        
+        img.onload = () => {
+          uploadTexture(img)
         }
 
-        const texture = gl.createTexture()
-        gl.bindTexture(gl.TEXTURE_2D, texture)
-        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, fallbackCanvas)
-        webglCard.texture = texture
-      }
+        img.onerror = () => {
+          if (img.src && img.src.includes('/gallery/infinite/')) {
+            console.log(`Local image ${config.imageUrl} failed to load. Falling back to Picsum stream.`);
+            // Downsized Picsum query to keep GPU allocations calm
+            img.src = `https://picsum.photos/seed/cyber${config.id}/300/200?grayscale`
+            return
+          }
 
-      img.src = config.imageUrl
+          const fallbackCanvas = document.createElement('canvas')
+          fallbackCanvas.width = 128
+          fallbackCanvas.height = 128
+          const ctx = fallbackCanvas.getContext('2d')
+          if (ctx) {
+            ctx.fillStyle = '#151515'
+            ctx.fillRect(0, 0, 128, 128)
+            ctx.fillStyle = '#f5f5dc'
+            ctx.font = 'bold 12px monospace'
+            ctx.fillText(config.title, 8, 60)
+          }
+
+          const texture = gl.createTexture()
+          gl.bindTexture(gl.TEXTURE_2D, texture)
+          gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, fallbackCanvas)
+          webglCard.texture = texture
+        }
+
+        img.src = config.imageUrl
+      }
     }
   }
 
@@ -425,11 +496,9 @@ export class GalleryCanvas {
     this.camVz *= this.FRICTION
     this.camZ += this.camVz
 
-    // Bidirectional endless coordinate wrapping globally for camera panning X/Y
-    const wrapX = 4000
-    const wrapY = 3000
-    this.camX = (this.camX % wrapX + wrapX) % wrapX
-    this.camY = (this.camY % wrapY + wrapY) % wrapY
+    // Clamp camera coordinates to inspect circular warp tunnel boundaries
+    this.camX = Math.max(-600, Math.min(600, this.camX))
+    this.camY = Math.max(-450, Math.min(450, this.camY))
     
     // Bidirectional endless camera Z coordinate depth tunnel looping
     this.camZ = (this.camZ % this.TOTAL_DEPTH + this.TOTAL_DEPTH) % this.TOTAL_DEPTH
@@ -443,7 +512,7 @@ export class GalleryCanvas {
 
     // Pass 3D Perspective Projection Matrix
     const aspect = width / height
-    const perspectiveMatrix = this.createPerspectiveMatrix(60 * Math.PI / 180, aspect, 1, 4000)
+    const perspectiveMatrix = this.createPerspectiveMatrix(60 * Math.PI / 180, aspect, 1, 6500)
     gl.uniformMatrix4fv(this.uProjectionMatrixLoc, false, perspectiveMatrix)
 
     // Combined velocities vector for shader distortions (X/Y drag and Z fly-zoom skew)
@@ -463,22 +532,16 @@ export class GalleryCanvas {
 
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.indexBuffer)
 
-    // Render loop over 36 scattered 3D corridor cards
+    // Render loop over 46 systematically corridors cards
     this.webglCards.forEach((card) => {
       // Calculate relative coordinate offset from 3D camera
-      let rx = card.x - this.camX
-      let ry = card.y - this.camY
+      const rx = card.x - this.camX
+      const ry = card.y - this.camY
       let rz = card.z - this.camZ
 
       // Endless 3D depth-tunnel Z-coordinate wrapping
       // As cards pass behind the camera, warp them seamlessly back to the far tunnel corridor depth
       rz = ((rz + this.WRAP_PADDING) % this.TOTAL_DEPTH + this.TOTAL_DEPTH) % this.TOTAL_DEPTH - this.WRAP_PADDING
-
-      // Panning endless wrapping along X & Y axes corridors
-      const halfX = wrapX / 2
-      const halfY = wrapY / 2
-      rx = ((rx + halfX) % wrapX + wrapX) % wrapX - halfX
-      ry = ((ry + halfY) % wrapY + wrapY) % wrapY - halfY
 
       // Responsive scaling for card size and radial corridors based on screen width
       const isMobile = width < 768
@@ -510,8 +573,35 @@ export class GalleryCanvas {
       }
     })
 
-    // Loop animation frames
-    this.animationFrameId = requestAnimationFrame(this.render)
+    // Demand-driven rendering: Check if velocities or dragging states require another frame.
+    const isStillMoving =
+      Math.abs(this.camVx) > 0.005 ||
+      Math.abs(this.camVy) > 0.005 ||
+      Math.abs(this.camVz) > 0.005
+
+    if (this.isDragging || isStillMoving) {
+      this.animationFrameId = requestAnimationFrame(this.render)
+    } else {
+      // Safely sleep and stop micro-drifts
+      this.camVx = 0
+      this.camVy = 0
+      this.camVz = 0
+      this.isRendering = false
+      this.animationFrameId = null
+    }
+  }
+
+  // --- Demand-Driven Wakeup Helper ---
+
+  private wakeUp(): void {
+    if (!this.active) return
+    if (!this.isRendering) {
+      this.isRendering = true
+      if (this.animationFrameId) {
+        cancelAnimationFrame(this.animationFrameId)
+      }
+      this.animationFrameId = requestAnimationFrame(this.render)
+    }
   }
 
   // --- Interaction Listeners ---
@@ -524,6 +614,7 @@ export class GalleryCanvas {
     this.dragStartCamX = this.camX
     this.dragStartCamY = this.camY
     this.canvas.style.cursor = 'grabbing'
+    this.wakeUp()
   }
 
   private onMouseMove(e: MouseEvent): void {
@@ -531,21 +622,24 @@ export class GalleryCanvas {
     const dx = e.clientX - this.dragStartX
     const dy = e.clientY - this.dragStartY
 
-    // Update camera panning with sensitivity
+    // Update camera panning in both dimensions to fully explore the circular warp tunnel splay!
     this.camX = this.dragStartCamX - dx * this.DRAG_SENSITIVITY
     this.camY = this.dragStartCamY - dy * this.DRAG_SENSITIVITY
+    this.wakeUp()
   }
 
   private onMouseUp(e: MouseEvent): void {
     if (!this.isDragging) return
     this.isDragging = false
     this.canvas.style.cursor = 'grab'
+    this.wakeUp()
   }
 
   private onWheel(e: WheelEvent): void {
-    e.preventDefault()
-    // Scroll wheel zoom moves camera forward/backward along the Z-axis
+    // Scroll wheel zoom moves camera forward/backward along the Z-axis.
+    // e.preventDefault() is not called since body scroll is locked globally when gallery is open.
     this.camVz += e.deltaY * this.SCROLL_SENSITIVITY
+    this.wakeUp()
   }
 
   private onTouchStart(e: TouchEvent): void {
@@ -555,28 +649,50 @@ export class GalleryCanvas {
       this.dragStartY = e.touches[0].clientY
       this.dragStartCamX = this.camX
       this.dragStartCamY = this.camY
+      this.wakeUp()
     }
   }
 
   private onTouchMove(e: TouchEvent): void {
     if (!this.isDragging) return
-    e.preventDefault()
+    // e.preventDefault() is omitted; touch-action: none style on canvas natively prevents browser scrolling.
     if (e.touches.length > 0) {
       const dx = e.touches[0].clientX - this.dragStartX
       const dy = e.touches[0].clientY - this.dragStartY
       
-      // Update camera panning on drag
+      // Update camera panning in both dimensions on drag
       this.camX = this.dragStartCamX - dx * this.DRAG_SENSITIVITY
       this.camY = this.dragStartCamY - dy * this.DRAG_SENSITIVITY
+      this.wakeUp()
     }
   }
 
   private onTouchEnd(e: TouchEvent): void {
     this.isDragging = false
+    this.wakeUp()
   }
 
   private onResize(): void {
     this.resizeCanvas()
+    this.wakeUp()
+  }
+
+  private handleContextLost(): void {
+    this.isRendering = false
+    if (this.animationFrameId) {
+      cancelAnimationFrame(this.animationFrameId)
+      this.animationFrameId = null
+    }
+  }
+
+  private handleContextRestored(): void {
+    if (!this.gl) return
+    this.setupShaders()
+    this.setupBuffers()
+    this.createFallbackTexture()
+    this.preloadCardTextures()
+    this.isRendering = false
+    this.show()
   }
 
   // --- Public Controls APIs ---
@@ -584,7 +700,7 @@ export class GalleryCanvas {
   public show(): void {
     if (this.active) return
     this.active = true
-    this.animationFrameId = requestAnimationFrame(this.render)
+    this.wakeUp()
   }
 
   public hide(): void {
@@ -594,6 +710,7 @@ export class GalleryCanvas {
       this.animationFrameId = null
     }
     this.isDragging = false
+    this.isRendering = false
   }
 
   public destroy(): void {
