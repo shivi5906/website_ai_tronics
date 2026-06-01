@@ -86,6 +86,7 @@ export class GalleryCanvas {
   private camZ = 0
   private targetCamX = 0
   private targetCamY = 0
+  private targetCamZ = 0
 
   private camVx = 0
   private camVy = 0
@@ -94,11 +95,11 @@ export class GalleryCanvas {
   // Inertia and friction constants
   private readonly FRICTION = 0.95 // High-quality smooth inertia decay
   private readonly DRAG_SENSITIVITY = 1.2 // Panning drag sensitivity
-  private readonly SCROLL_SENSITIVITY = 0.22 // Scroll-depth flying speed
+  private readonly SCROLL_SENSITIVITY = 0.45 // Increased scroll-depth flying speed to match expanded depth tunnel
 
   // Endless 3D tunnel parameters
-  private readonly TOTAL_DEPTH = 5400 // Endless Z-tunnel length (expanded from 3200)
-  private readonly WRAP_PADDING = 300 // Z-wrapping buffer (expanded from 200)
+  private readonly TOTAL_DEPTH = 8800 // Extended Z-tunnel length to reduce card density along Z
+  private readonly WRAP_PADDING = 400 // Expanded Z-wrapping buffer
 
   // Drag and touch state
   private isDragging = false
@@ -106,6 +107,7 @@ export class GalleryCanvas {
   private dragStartY = 0
   private dragStartCamX = 0
   private dragStartCamY = 0
+  private dragStartCamZ = 0
 
   private active = false
   private isRendering = false
@@ -136,6 +138,7 @@ export class GalleryCanvas {
     this.camZ = 0
     this.targetCamX = 0
     this.targetCamY = 0
+    this.targetCamZ = 0
 
     this.boundOnMouseDown = this.onMouseDown.bind(this)
     this.boundOnMouseMove = this.onMouseMove.bind(this)
@@ -197,10 +200,10 @@ export class GalleryCanvas {
     window.addEventListener('mouseup', this.boundOnMouseUp)
     this.canvas.addEventListener('wheel', this.boundOnWheel, { passive: true })
 
-    // Touch events for mobile compatibility
-    this.canvas.addEventListener('touchstart', this.boundOnTouchStart, { passive: true })
-    window.addEventListener('touchmove', this.boundOnTouchMove, { passive: true })
-    window.addEventListener('touchend', this.boundOnTouchEnd, { passive: true })
+    // Touch events for mobile compatibility (non-passive to allow e.preventDefault() lockdown)
+    this.canvas.addEventListener('touchstart', this.boundOnTouchStart, { passive: false })
+    window.addEventListener('touchmove', this.boundOnTouchMove, { passive: false })
+    window.addEventListener('touchend', this.boundOnTouchEnd, { passive: false })
 
     window.addEventListener('resize', this.boundOnResize)
   }
@@ -345,15 +348,35 @@ export class GalleryCanvas {
 
     const cardCount = 46 // Tiled count scattered in the 3D space
     
+    // Create an array of indices from 0 to cardConfigs.length - 1, and shuffle it using Fisher-Yates algorithm
+    const shuffledIndices = Array.from({ length: this.cardConfigs.length }, (_, i) => i)
+    for (let idx = shuffledIndices.length - 1; idx > 0; idx--) {
+      const targetIdx = Math.floor(Math.random() * (idx + 1));
+      const temp = shuffledIndices[idx]
+      shuffledIndices[idx] = shuffledIndices[targetIdx]
+      shuffledIndices[targetIdx] = temp
+    }
+
     for (let i = 0; i < cardCount; i++) {
-      const configIndex = i % this.cardConfigs.length
+      const configIndex = shuffledIndices[i % shuffledIndices.length]
       const config = this.cardConfigs[configIndex]
 
-      // Systematic circular cylinder warp tunnel layout
+      // Systematic rectangular tunnel spiral layout
       const angle = (i / cardCount) * Math.PI * 12 // 6 full systematic rotations around the Z axis
-      const radius = 780 // Perfect circular cylinder radius
-      const x = Math.cos(angle) * radius
-      const y = Math.sin(angle) * radius
+      const u = Math.cos(angle)
+      const v = Math.sin(angle)
+      
+      // Map unit circle coordinates to a unit square perimeter
+      const scale = 1.0 / Math.max(Math.abs(u), Math.abs(v))
+      const x_rect = u * scale
+      const y_rect = v * scale
+
+      // Rectangular tunnel baseline half-width and half-height
+      const baseWidth = 920
+      const baseHeight = 690
+
+      const x = x_rect * baseWidth
+      const y = y_rect * baseHeight
 
       // Spaced cleanly and evenly along the Z depth tunnel
       const z = (i / cardCount) * this.TOTAL_DEPTH
@@ -474,34 +497,51 @@ export class GalleryCanvas {
     const height = this.canvas.height
     const seconds = time * 0.001
 
-    // Apply Inertia Physics / Momentum Friction to Camera coordinates
-    if (!this.isDragging) {
-      this.camVx *= this.FRICTION
-      this.camVy *= this.FRICTION
-      
-      this.camX += this.camVx
-      this.camY += this.camVy
-      
-      this.targetCamX = this.camX
-      this.targetCamY = this.camY
-    } else {
-      this.camVx = this.camX - this.targetCamX
-      this.camVy = this.camY - this.targetCamY
-      
-      this.targetCamX = this.camX
-      this.targetCamY = this.camY
+    // Ultra-smooth target easing LERP (Linear Interpolation) camera mechanics
+    // Smooths out all mouse coordinates, touch swipes, and wheel scrolls into silk-like fluid paths
+    const easeFactor = 0.12
+
+    // Auto-decay mobile target Y to keep the tunnel vertically centered
+    const isMobileDevice = width < 768
+    if (isMobileDevice) {
+      this.targetCamY *= 0.92
     }
 
-    // Camera depth travel (Z-axis) velocity friction decay
-    this.camVz *= this.FRICTION
-    this.camZ += this.camVz
+    // Clamp target bounds to prevent flying off-screen completely
+    if (isMobileDevice) {
+      this.targetCamX = Math.max(-400, Math.min(400, this.targetCamX))
+    } else {
+      this.targetCamX = Math.max(-750, Math.min(750, this.targetCamX))
+      this.targetCamY = Math.max(-550, Math.min(550, this.targetCamY))
+    }
 
-    // Clamp camera coordinates to inspect circular warp tunnel boundaries
-    this.camX = Math.max(-600, Math.min(600, this.camX))
-    this.camY = Math.max(-450, Math.min(450, this.camY))
-    
+    // Smoothly LERP camera coordinates towards their targets
+    const dX = this.targetCamX - this.camX
+    const dY = this.targetCamY - this.camY
+    const dZ = this.targetCamZ - this.camZ
+
+    const stepX = dX * easeFactor
+    const stepY = dY * easeFactor
+    const stepZ = dZ * easeFactor
+
+    this.camX += stepX
+    this.camY += stepY
+    this.camZ += stepZ
+
+    // Drive chromatic aberration and vertex warp shader velocities proportional to easing steps
+    this.camVx = stepX
+    this.camVy = stepY
+    this.camVz = stepZ
+
     // Bidirectional endless camera Z coordinate depth tunnel looping
-    this.camZ = (this.camZ % this.TOTAL_DEPTH + this.TOTAL_DEPTH) % this.TOTAL_DEPTH
+    // Keep targetCamZ in sync when camera loops around TOTAL_DEPTH
+    if (this.camZ < 0) {
+      this.camZ += this.TOTAL_DEPTH
+      this.targetCamZ += this.TOTAL_DEPTH
+    } else if (this.camZ >= this.TOTAL_DEPTH) {
+      this.camZ -= this.TOTAL_DEPTH
+      this.targetCamZ -= this.TOTAL_DEPTH
+    }
 
     // WebGL Reset Frame
     gl.clearColor(0.04, 0.04, 0.04, 1.0)
@@ -534,19 +574,30 @@ export class GalleryCanvas {
 
     // Render loop over 46 systematically corridors cards
     this.webglCards.forEach((card) => {
-      // Calculate relative coordinate offset from 3D camera
-      const rx = card.x - this.camX
-      const ry = card.y - this.camY
+      // Calculate relative depth coordinate from 3D camera
       let rz = card.z - this.camZ
 
       // Endless 3D depth-tunnel Z-coordinate wrapping
       // As cards pass behind the camera, warp them seamlessly back to the far tunnel corridor depth
       rz = ((rz + this.WRAP_PADDING) % this.TOTAL_DEPTH + this.TOTAL_DEPTH) % this.TOTAL_DEPTH - this.WRAP_PADDING
 
+      // Dynamic diverging rectangle coordinates!
+      // As cards approach the camera (rz -> 0), they flare outward widely,
+      // and when they are far away (rz -> TOTAL_DEPTH), they gather in a tight central rectangle.
+      const t = Math.max(0.0, Math.min(1.0, rz / this.TOTAL_DEPTH)) // Clamped progress from 0 (close) to 1 (far)
+      
+      // Funnel factor scales quadratically from 0.30 (horizon) up to 1.88 (camera closeup)
+      // Spreads cards out radially in X & Y even in the deep distance to eliminate overlapping clutter.
+      const funnelFactor = 0.30 + 1.58 * Math.pow(1.0 - t, 2.2)
+
+      // Calculate camera relative coordinates with dynamic funnel scaling
+      const rx = card.x * funnelFactor - this.camX
+      const ry = card.y * funnelFactor - this.camY
+
       // Responsive scaling for card size and radial corridors based on screen width
       const isMobile = width < 768
       const isTablet = width >= 768 && width < 1024
-      const scaleFactor = isMobile ? 0.6 : (isTablet ? 0.8 : 1.0)
+      const scaleFactor = isMobile ? 0.45 : (isTablet ? 0.75 : 1.0)
       
       const cardW = card.width * scaleFactor
       const cardH = card.height * scaleFactor
@@ -573,16 +624,20 @@ export class GalleryCanvas {
       }
     })
 
-    // Demand-driven rendering: Check if velocities or dragging states require another frame.
+    // Demand-driven rendering: Check if camera is still approaching its targets
     const isStillMoving =
-      Math.abs(this.camVx) > 0.005 ||
-      Math.abs(this.camVy) > 0.005 ||
-      Math.abs(this.camVz) > 0.005
+      Math.abs(this.targetCamX - this.camX) > 0.05 ||
+      Math.abs(this.targetCamY - this.camY) > 0.05 ||
+      Math.abs(this.targetCamZ - this.camZ) > 0.05
 
     if (this.isDragging || isStillMoving) {
       this.animationFrameId = requestAnimationFrame(this.render)
     } else {
-      // Safely sleep and stop micro-drifts
+      // Snap exactly to target coordinate values to halt micro-drifts
+      this.camX = this.targetCamX
+      this.camY = this.targetCamY
+      this.camZ = this.targetCamZ
+      
       this.camVx = 0
       this.camVy = 0
       this.camVz = 0
@@ -611,8 +666,8 @@ export class GalleryCanvas {
     this.isDragging = true
     this.dragStartX = e.clientX
     this.dragStartY = e.clientY
-    this.dragStartCamX = this.camX
-    this.dragStartCamY = this.camY
+    this.dragStartCamX = this.targetCamX
+    this.dragStartCamY = this.targetCamY
     this.canvas.style.cursor = 'grabbing'
     this.wakeUp()
   }
@@ -622,9 +677,9 @@ export class GalleryCanvas {
     const dx = e.clientX - this.dragStartX
     const dy = e.clientY - this.dragStartY
 
-    // Update camera panning in both dimensions to fully explore the circular warp tunnel splay!
-    this.camX = this.dragStartCamX - dx * this.DRAG_SENSITIVITY
-    this.camY = this.dragStartCamY - dy * this.DRAG_SENSITIVITY
+    // Update target coordinates smoothly to explore rectangular tunnel corridors
+    this.targetCamX = this.dragStartCamX - dx * this.DRAG_SENSITIVITY
+    this.targetCamY = this.dragStartCamY - dy * this.DRAG_SENSITIVITY
     this.wakeUp()
   }
 
@@ -636,33 +691,42 @@ export class GalleryCanvas {
   }
 
   private onWheel(e: WheelEvent): void {
-    // Scroll wheel zoom moves camera forward/backward along the Z-axis.
-    // e.preventDefault() is not called since body scroll is locked globally when gallery is open.
-    this.camVz += e.deltaY * this.SCROLL_SENSITIVITY
+    // Scroll wheel zoom moves camera target forward/backward along the Z-axis smoothly.
+    this.targetCamZ += e.deltaY * this.SCROLL_SENSITIVITY
     this.wakeUp()
   }
 
   private onTouchStart(e: TouchEvent): void {
+    if (e.cancelable) {
+      e.preventDefault()
+    }
     if (e.touches.length > 0) {
       this.isDragging = true
       this.dragStartX = e.touches[0].clientX
       this.dragStartY = e.touches[0].clientY
-      this.dragStartCamX = this.camX
-      this.dragStartCamY = this.camY
+      this.dragStartCamX = this.targetCamX
+      this.dragStartCamY = this.targetCamY
+      this.dragStartCamZ = this.targetCamZ
       this.wakeUp()
     }
   }
 
   private onTouchMove(e: TouchEvent): void {
     if (!this.isDragging) return
-    // e.preventDefault() is omitted; touch-action: none style on canvas natively prevents browser scrolling.
+    if (e.cancelable) {
+      e.preventDefault()
+    }
     if (e.touches.length > 0) {
       const dx = e.touches[0].clientX - this.dragStartX
       const dy = e.touches[0].clientY - this.dragStartY
       
-      // Update camera panning in both dimensions on drag
-      this.camX = this.dragStartCamX - dx * this.DRAG_SENSITIVITY
-      this.camY = this.dragStartCamY - dy * this.DRAG_SENSITIVITY
+      // Horizontal swipe controls horizontal camera panning (look around)
+      this.targetCamX = this.dragStartCamX - dx * 0.9
+      
+      // Vertical swipe controls flying forward/backward along the Z-axis (scroll equivalent)
+      // Swiping UP flies forward (+Z), swiping DOWN flies backward (-Z)
+      this.targetCamZ = this.dragStartCamZ - dy * 4.6
+      
       this.wakeUp()
     }
   }

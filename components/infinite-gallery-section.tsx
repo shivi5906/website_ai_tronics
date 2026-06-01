@@ -45,9 +45,17 @@ interface InfiniteGallerySectionProps {
   onBack?: () => void
   onNavigate?: (sectionId: string) => void
   onHome?: () => void
+  isMuted?: boolean
+  onToggleMute?: () => void
 }
 
-export default function InfiniteGallerySection({ onBack, onNavigate, onHome }: InfiniteGallerySectionProps) {
+export default function InfiniteGallerySection({ 
+  onBack, 
+  onNavigate, 
+  onHome,
+  isMuted = false,
+  onToggleMute
+}: InfiniteGallerySectionProps) {
   const canvasContainerRef = useRef<HTMLDivElement>(null)
   const galleryEngineRef = useRef<GalleryCanvas | null>(null)
 
@@ -133,6 +141,28 @@ export default function InfiniteGallerySection({ onBack, onNavigate, onHome }: I
 
   return (
     <div className="relative w-full h-screen bg-[#0a0a0a] overflow-hidden">
+      {/* Dynamic Sound Mute Button */}
+      {onToggleMute && (
+        <div className="fixed top-8 left-8 z-50">
+          <button 
+            onClick={onToggleMute}
+            className="font-mono text-[10px] tracking-[0.2em] transition-all duration-300 flex items-center gap-2 cursor-pointer p-2.5 bg-black/50 backdrop-blur-md border border-[#f5f5dc]/10 text-[#a8a29e] hover:text-[#f5f5dc] rounded-none"
+          >
+            {isMuted ? (
+              <>
+                <span className="w-1.5 h-1.5 bg-[#ff0040] rounded-full animate-ping" />
+                SOUND OFF
+              </>
+            ) : (
+              <>
+                <span className="w-1.5 h-1.5 bg-[#00ffff] rounded-full animate-pulse" />
+                SOUND ON
+              </>
+            )}
+          </button>
+        </div>
+      )}
+
       {/* Brand logo top right */}
       <div className="fixed top-8 right-8 z-50 hidden md:block">
         <button
@@ -161,12 +191,12 @@ export default function InfiniteGallerySection({ onBack, onNavigate, onHome }: I
       <div ref={canvasContainerRef} className="w-full h-full absolute inset-0 z-10" />
 
       {/* FLOATING NAVIGATION INSTRUCTIONS BANNER */}
-      <div className="fixed bottom-20 left-1/2 transform -translate-x-1/2 z-50 text-center pointer-events-none select-none px-6 py-3 rounded-lg border border-[#f5f5dc]/10 bg-black/85 backdrop-blur-md max-w-[90vw] md:max-w-xl">
+      <div className="fixed bottom-20 left-1/2 transform -translate-x-1/2 z-50 text-center pointer-events-none select-none px-5 py-2.5 border border-[#f5f5dc]/10 bg-black/85 backdrop-blur-md w-[92%] max-w-sm">
         <p className="font-mono text-[10px] md:text-xs text-[#a8a29e] tracking-[0.15em] uppercase leading-relaxed">
-          Scroll <span className="text-[#f5f5dc] font-bold">Down</span> to explore new, <span className="text-[#f5f5dc] font-bold">Up</span> to explore old
+          Scroll <span className="text-[#f5f5dc] font-bold">Down</span> or Swipe <span className="text-[#f5f5dc] font-bold">UP</span> to fly forward
         </p>
         <p className="font-mono text-[9px] md:text-[10px] text-[#6b6b6b] tracking-[0.1em] uppercase mt-1">
-          Drag <span className="text-[#a8a29e]">sideways</span> to view photos or move them
+          Drag / Swipe <span className="text-[#a8a29e]">LEFT/RIGHT</span> to look around
         </p>
       </div>
 
