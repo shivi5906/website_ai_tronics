@@ -1,5 +1,28 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
+@import url('https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Six+Caps&display=swap');
+
+.funky-credit {
+  font-family: 'Permanent Marker', cursive, sans-serif !important;
+  background: linear-gradient(45deg, #00ffff, #ff007f);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+  display: inline-block;
+  letter-spacing: 0.1em;
+}
+
+.six-caps-signature {
+  font-family: 'Six Caps', sans-serif !important;
+  background: linear-gradient(45deg, #00ffff, #ff007f);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
+  display: inline-block;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  font-weight: 400;
+}
 
 @custom-variant dark (&:is(.dark *));
 

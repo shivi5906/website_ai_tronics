@@ -1,23 +1,34 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef } from 'react'
 
 export default function CustomCursor() {
-  const [position, setPosition] = useState({ x: -100, y: -100 })
-  const [isVisible, setIsVisible] = useState(false)
+  const cursorRef = useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {
+    const cursorEl = cursorRef.current
+    if (!cursorEl) return
+
     const handleMouseMove = (e: MouseEvent) => {
-      setPosition({ x: e.clientX, y: e.clientY })
-      setIsVisible(true)
+      // Direct DOM update using translate3d triggers GPU layer and avoids triggering reflows
+      cursorEl.style.transform = `translate3d(${e.clientX}px, ${e.clientY}px, 0)`
+      cursorEl.style.opacity = '1'
     }
 
-    const handleMouseLeave = () => setIsVisible(false)
-    const handleMouseEnter = () => setIsVisible(true)
+    const handleMouseLeave = () => {
+      cursorEl.style.opacity = '0'
+    }
+    const handleMouseEnter = () => {
+      cursorEl.style.opacity = '1'
+    }
 
     window.addEventListener('mousemove', handleMouseMove)
     document.addEventListener('mouseleave', handleMouseLeave)
     document.addEventListener('mouseenter', handleMouseEnter)
+
+    // Initial hidden state off-screen
+    cursorEl.style.transform = 'translate3d(-100px, -100px, 0)'
+    cursorEl.style.opacity = '0'
 
     return () => {
       window.removeEventListener('mousemove', handleMouseMove)
@@ -28,11 +39,10 @@ export default function CustomCursor() {
 
   return (
     <div
+      ref={cursorRef}
       className="custom-cursor hidden md:block"
       style={{
-        left: position.x,
-        top: position.y,
-        opacity: isVisible ? 1 : 0,
+        opacity: 0,
       }}
     >
       {/* Triangular pointer cursor with shadow */}

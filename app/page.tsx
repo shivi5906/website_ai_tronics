@@ -67,6 +67,17 @@ export default function Home() {
     return () => clearTimeout(timer)
   }, [isLoaded])
 
+  // Dynamically lock/unlock body scroll based on current view to prevent browser scrollbars/extra space
+  useEffect(() => {
+    if (currentView === 'landing' || currentView === 'menu' || currentView === 'infinite-gallery') {
+      document.documentElement.style.overflow = 'hidden'
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.documentElement.style.overflow = ''
+      document.body.style.overflow = ''
+    }
+  }, [currentView])
+
   const handleEnterSociety = () => {
     setCurrentView('infinite-gallery')
   }
