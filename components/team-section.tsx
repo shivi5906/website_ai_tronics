@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { Github, Instagram, Linkedin } from 'lucide-react'
 
 interface TeamMember {
@@ -14,20 +14,20 @@ interface TeamMember {
 
 const teamMembers: TeamMember[] = [
   {
-    name: 'ALEX CHEN',
-    role: '// LEAD ARCHITECT',
-    image: 'https://picsum.photos/seed/team1/400/500?grayscale',
-    github: '#',
-    instagram: '#',
-    linkedin: '#',
+    name: 'DR. JUHI GUPTA ',
+    role: 'FACULTY COORDINATOR ',
+    image: '/gallery/heads/juhi.jpg',
+    github: undefined,
+    instagram: undefined,
+    linkedin: 'https://www.linkedin.com/in/dr-juhi-gupta-11b6601a/',
   },
   {
-    name: 'MAYA PATEL',
-    role: '// ML ENGINEER',
-    image: 'https://picsum.photos/seed/team2/400/500?grayscale',
-    github: '#',
-    instagram: '#',
-    linkedin: '#',
+    name: 'HIMANSHU CHAUDHARY',
+    role: 'FACULTY COORDINATOR',
+    image: '/gallery/heads/himanshu.jpg',
+    github: undefined,
+    instagram: undefined,
+    linkedin: 'https://www.linkedin.com/in/himanshu-chaudhary-6524a757/',
   },
   {
     name: 'RYAN KUMAR',
@@ -44,6 +44,98 @@ const teamMembers: TeamMember[] = [
     github: '#',
     instagram: '#',
     linkedin: '#',
+  },
+    {
+    name: 'ZOE WILLIAMS',
+    role: '// SYSTEMS ENGINEER',
+    image: 'https://picsum.photos/seed/team4/400/500?grayscale',
+    github: '#',
+    instagram: '#',
+    linkedin: '#',
+  },  {
+    name: 'ARYAN TRIPATHI ',
+    role: 'PRESIDENT ',
+    image: '/gallery/heads/aryan.jpg',
+    github: undefined,
+    instagram: 'https://www.instagram.com/__a.a.r.y.a.n___/',
+    linkedin: 'https://www.linkedin.com/in/aryan-tripathi-a8319b330?utm_source=share_via&utm_content=profile&utm_medium=member_android',
+  },  {
+    name: 'AREIN JAIN',
+    role: 'VICE PRESIDENT ',
+    image: '/gallery/heads/arin.jpg',
+    github: 'https://github.com/jainarein/jainarein',
+    instagram: 'https://www.instagram.com/areinjain23/',
+    linkedin: ' https://www.linkedin.com/in/arein-jain',
+  },  {
+    name: 'ZOE WILLIAMS',
+    role: '// SYSTEMS ENGINEER',
+    image: 'https://picsum.photos/seed/team4/400/500?grayscale',
+    github: '#',
+    instagram: '#',
+    linkedin: '#',
+  },  {
+    name: 'ZOE WILLIAMS',
+    role: '// SYSTEMS ENGINEER',
+    image: 'https://picsum.photos/seed/team4/400/500?grayscale',
+    github: '#',
+    instagram: '#',
+    linkedin: '#',
+  },  {
+    name: 'ZOE WILLIAMS',
+    role: '// SYSTEMS ENGINEER',
+    image: 'https://picsum.photos/seed/team4/400/500?grayscale',
+    github: '#',
+    instagram: '#',
+    linkedin: '#',
+  },  {
+    name: 'ZOE WILLIAMS',
+    role: '// SYSTEMS ENGINEER',
+    image: 'https://picsum.photos/seed/team4/400/500?grayscale',
+    github: '#',
+    instagram: '#',
+    linkedin: '#',
+  },  {
+    name: 'ZOE WILLIAMS',
+    role: '// SYSTEMS ENGINEER',
+    image: 'https://picsum.photos/seed/team4/400/500?grayscale',
+    github: '#',
+    instagram: '#',
+    linkedin: '#',
+  },  {
+    name: 'ZOE WILLIAMS',
+    role: '// SYSTEMS ENGINEER',
+    image: 'https://picsum.photos/seed/team4/400/500?grayscale',
+    github: '#',
+    instagram: '#',
+    linkedin: '#',
+  },  {
+    name: 'ZOE WILLIAMS',
+    role: '// SYSTEMS ENGINEER',
+    image: 'https://picsum.photos/seed/team4/400/500?grayscale',
+    github: '#',
+    instagram: '#',
+    linkedin: '#',
+  },  {
+    name: 'ZOE WILLIAMS',
+    role: '// SYSTEMS ENGINEER',
+    image: 'https://picsum.photos/seed/team4/400/500?grayscale',
+    github: '#',
+    instagram: '#',
+    linkedin: '#',
+  },  {
+    name: 'ZOE WILLIAMS',
+    role: '// SYSTEMS ENGINEER',
+    image: 'https://picsum.photos/seed/team4/400/500?grayscale',
+    github: '#',
+    instagram: '#',
+    linkedin: '#',
+  },  {
+    name: 'DISHA MOHNANI',
+    role: 'DIGITAL AND CINEMATICS HEAD ',
+    image: '/gallery/heads/disha.jpg',
+    github: 'https://github.com/mohnanidisha',
+    instagram: 'https://www.instagram.com/dishaamohnani/',
+    linkedin: 'https://www.linkedin.com/in/dishamohnani',
   },
 ]
 
@@ -129,6 +221,21 @@ export default function TeamSection({ onBack, onHome }: TeamSectionProps) {
 function TeamCard({ member, delay, isVisible }: { member: TeamMember; delay: number; isVisible: boolean }) {
   const [isHovered, setIsHovered] = useState(false)
 
+  const getLinkProps = (url?: string) => {
+    if (!url) return {}
+    if (url.startsWith('http')) {
+      return {
+        href: url,
+        target: '_blank',
+        rel: 'noopener noreferrer'
+      }
+    }
+    return {
+      href: url,
+      onClick: (e: React.MouseEvent) => e.preventDefault()
+    }
+  }
+
   return (
     <div 
       className={`glass-card p-5 group relative overflow-hidden transition-all duration-700 ${
@@ -171,17 +278,17 @@ function TeamCard({ member, delay, isVisible }: { member: TeamMember; delay: num
       {/* Social Links */}
       <div className="flex gap-4">
         {member.github && (
-          <a href={member.github} className="text-[#6b6b6b] hover:text-[#f5f5dc] transition-colors cursor-pointer">
+          <a {...getLinkProps(member.github)} className="text-[#6b6b6b] hover:text-[#f5f5dc] transition-colors cursor-pointer">
             <Github size={16} />
           </a>
         )}
         {member.instagram && (
-          <a href={member.instagram} className="text-[#6b6b6b] hover:text-[#f5f5dc] transition-colors cursor-pointer">
+          <a {...getLinkProps(member.instagram)} className="text-[#6b6b6b] hover:text-[#f5f5dc] transition-colors cursor-pointer">
             <Instagram size={16} />
           </a>
         )}
         {member.linkedin && (
-          <a href={member.linkedin} className="text-[#6b6b6b] hover:text-[#f5f5dc] transition-colors cursor-pointer">
+          <a {...getLinkProps(member.linkedin)} className="text-[#6b6b6b] hover:text-[#f5f5dc] transition-colors cursor-pointer">
             <Linkedin size={16} />
           </a>
         )}
