@@ -139,7 +139,15 @@ export default function Home() {
       case 'contact':
         return <ContactSection onBack={handleBackToMenu} onHome={() => setCurrentView('landing')} />
       case 'infinite-gallery':
-        return <InfiniteGallerySection onBack={handleBackToMenu} onNavigate={handleSelectSection} onHome={() => setCurrentView('landing')} />
+        return (
+          <InfiniteGallerySection 
+            onBack={handleBackToMenu} 
+            onNavigate={handleSelectSection} 
+            onHome={() => setCurrentView('landing')} 
+            isMuted={isMuted}
+            onToggleMute={() => setIsMuted(!isMuted)}
+          />
+        )
       default:
         return <LandingHero onEnter={handleEnterSociety} />
     }
