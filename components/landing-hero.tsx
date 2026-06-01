@@ -42,7 +42,7 @@ const generatePhotos = (): Photo[] => {
   ]
 
   const labels = [
-    'HACKATHON 2026', 'WORKSHOP', 'TEAM BUILD', 'CODE NIGHT',
+    'HACKATHON 2025', 'WORKSHOP', 'TEAM BUILD', 'CODE NIGHT',
     'AI SUMMIT', 'ROBOTICS', 'NEURAL NET', 'TECH TALK',
     'IDEATION', 'PROTOTYPE', 'DEMO DAY', 'LAUNCH'
   ]
@@ -331,7 +331,7 @@ export default function LandingHero({ onEnter, onScrollDown, isMuted = false, on
             A Society of Minds Building Tomorrow
           </p>
           <p className="font-mono text-[10px] text-[#6b6b6b] tracking-[0.3em] mb-12">
-            JIIT NOIDA // EST. 2026
+            JIIT NOIDA // EST. 2025
           </p>
 
           {/* Enter Button */}
@@ -371,7 +371,7 @@ export default function LandingHero({ onEnter, onScrollDown, isMuted = false, on
           className="font-mono text-xs text-[#6b6b6b] tracking-[0.3em]"
           style={{ writingMode: 'vertical-rl', textOrientation: 'mixed' }}
         >
-          AI-TRONICS 2026
+          AI-TRONICS 2025
         </span>
       </div>
 
@@ -395,7 +395,7 @@ export default function LandingHero({ onEnter, onScrollDown, isMuted = false, on
       <div className="absolute bottom-6 left-6 z-50">
         <div className="font-mono text-xs text-[#6b6b6b] leading-relaxed tracking-wider">
           <p>AI-TRONICS</p>
-          <p>2026</p>
+          <p>2025</p>
           <p>JIIT NOIDA</p>
         </div>
       </div>

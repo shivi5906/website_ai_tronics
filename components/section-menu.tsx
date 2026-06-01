@@ -193,7 +193,7 @@ export default function SectionMenu({ isOpen, onClose, onSelectSection, currentS
             <div className="font-mono text-[10px] text-[#6b6b6b] tracking-wider leading-relaxed">
               <p>AI-TRONICS HUB</p>
               <p>JIIT NOIDA</p>
-              <p>EST. 2026</p>
+              <p>EST. 2025</p>
             </div>
 
             <div className="font-mono text-[10px] text-[#6b6b6b] tracking-wider text-right">
