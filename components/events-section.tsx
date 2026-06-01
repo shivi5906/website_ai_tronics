@@ -12,53 +12,59 @@ interface GalleryImage {
 
 const galleryImages: GalleryImage[] = [
   { 
-    src: 'https://picsum.photos/seed/event1/600/400?grayscale', 
-    title: 'HACKATHON 2026', 
-    date: 'MAR 15',
-    description: 'Our flagship 24-hour coding sprint where innovators build high-impact artificial intelligence models and robotic controllers to solve critical, real-world problems under intense time constraints.'
+    src: '/gallery/events/orientation.jpg', 
+    title: 'Orientation 2025', 
+    date: '17th Sept 2025',
+    description: 'Welcome to AI Tronics Orientation 2025 , where we talk less “assignments due” and more AI, ML, Robotics, Cybersecurity, IoT, UAV/Drones & Image Processing '
   },
   { 
-    src: 'https://picsum.photos/seed/event2/600/400?grayscale', 
-    title: 'AI WORKSHOP', 
-    date: 'FEB 28',
-    description: 'A comprehensive, hands-on masterclass focused on deep learning frameworks, neural network tuning, and implementing real-time computer vision algorithms on edge computing platforms.'
+    src: '/gallery/events/c_lang.jpeg', 
+    title: 'CPP Workshop Online ', 
+    date: '17th Jan 2026',
+    
+    description: 'The C++ Workshop provided an engaging introduction to programming concepts and problem-solving techniques. Participants explored core C++ fundamentals through live coding sessions and practical examples. The event helped students strengthen their coding skills and develop a deeper understanding of software development.\n\nMODE Online '
+    
   },
   { 
-    src: 'https://picsum.photos/seed/event3/600/400?grayscale', 
-    title: 'ROBOTICS DEMO', 
-    date: 'JAN 20',
-    description: 'Live exhibition showcasing autonomous systems, robotic arm kinematics, PID control loops, and sensor fusion platforms designed and assembled entirely by our core hardware team.'
+    src: '/gallery/events/innovate.jpeg', 
+    title: 'INNOVATE 1.0 ', 
+    date: '11th - 12th Nov 2025',
+    description: 'A combined workshop for both the CYBER SEC and the FPGA . In a world where every click, connection, and line of code is a doorway — security isn’t optional, it’s essential.Cyber-attacks are evolving, digital threats are rising, and tomorrow’s defenders are being shaped today. The world is moving beyond software — and now, hardware intelligence is taking center stage.FPGA technology is powering cutting-edge AI systems, autonomous robotics, secure computing, and real-time innovations across the globe.'},
+  { 
+    src: '/gallery/events/fpga.jpg', 
+    title: 'FPGA WORKSHOP - INNOVATE 1.0', 
+    date: '11th - 12th Nov 2025',
+    description: 'FPGA technology is powering cutting-edge AI systems, autonomous robotics, secure computing, and real-time innovations across the globe.'
   },
   { 
-    src: 'https://picsum.photos/seed/event4/600/400?grayscale', 
-    title: 'NEURAL NETS 101', 
-    date: 'DEC 10',
-    description: 'An introductory boot camp covering the foundations of feedforward networks, gradient descent, backpropagation, and practical model construction with popular framework stacks.'
+    src: '/gallery/events/cyberSEC.jpg', 
+    title: 'CYBER SECURITY WORKSHOP - INNOVATE 1.0', 
+    date: '11th - 12th Nov 2025',
+    description: 'In a world where every click, connection, and line of code is a doorway — security isn’t optional, it’s essential.Cyber-attacks are evolving, digital threats are rising, and tomorrow’s defenders are being shaped today.'},
+  { 
+    src: '/gallery/events/arvr.jpg', 
+    title: 'AR VR WORKSHOP ', 
+    date: '17th Jan 2026',
+    description: 'Some moments from an exciting AR/VR Workshop! 🥽✨Conducted by @chhavigg (founder, BharatXR) in collaboration with SnapAR 🤝A session filled with learning, innovation, and future tech vibes'
   },
   { 
-    src: 'https://picsum.photos/seed/event5/600/400?grayscale', 
-    title: 'TECH SUMMIT', 
-    date: 'NOV 05',
-    description: 'An elite annual gathering of tech visionaries, developers, and industry experts discussing automation paradigms, quantum computing, ethics in AI, and future technological frontiers.'
+    src: '/gallery/events/MLWORK.jpg', 
+    title: 'ML ONLINE WORKSHOP ', 
+    date: '24th - 25th Jan 2026',
+    description: ' MODE : ONLINE \n\nIntensive multi-day training session tracking regression, classification systems, clustering algorithms, feature engineering pipelines, and real-world deployment practices.'
   },
   { 
-    src: 'https://picsum.photos/seed/event6/600/400?grayscale', 
-    title: 'CODE SPRINT', 
-    date: 'OCT 22',
-    description: 'A high-octane competitive programming and rapid software engineering tournament testing algorithmic agility, database efficiency, and raw problem-solving speed.'
+    src: '/gallery/events/kark.jpeg', 
+    title: 'KRAKEN’X HACKATHON ', 
+    date: '24th - 25th April 2026',
+    description: 'AI/ML × Aitronics presents Kraken’X Hackathon 2026 🤝⚡Get ready for two days of intense building, innovation, and competition on 24–25 April. With a prize pool of ₹40,000, this hackathon brings together some of the most impactful domains — Finance, Cybersecurity, Healthcare, and Agriculture.'
   },
   { 
-    src: 'https://picsum.photos/seed/event7/600/400?grayscale', 
-    title: 'ML BOOTCAMP', 
-    date: 'SEP 18',
-    description: 'Intensive multi-day training session tracking regression, classification systems, clustering algorithms, feature engineering pipelines, and real-world deployment practices.'
-  },
-  { 
-    src: 'https://picsum.photos/seed/event8/600/400?grayscale', 
-    title: 'IOT FEST', 
-    date: 'AUG 30',
-    description: 'A dynamic hardware exhibition focusing on smart embedded environments, sensor networks, wireless telemetry, microcontrollers, and edge computing architectures.'
-  },
+    src: '/gallery/events/digital.jpg', 
+    title: 'DIGITAL CITY ESCAPE', 
+    date: '11TH April 2026',
+    description: ' Locked in a digital maze of codes & chaos…Only the smartest escape.Will you? '
+  }
 ]
 
 interface EventsSectionProps {

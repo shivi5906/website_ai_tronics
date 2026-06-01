@@ -173,7 +173,7 @@ export default function Home() {
           // instantly fall back to the high-availability online stream seamlessly!
           if (audioSrc === '/audio/industry_baby.mp3') {
             console.log("Local industry_baby.mp3 not found or failed to load. Falling back to online stream.");
-            setAudioSrc('https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3');
+            // setAudioSrc('https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3');
           }
         }}
         loop
