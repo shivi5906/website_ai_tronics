@@ -23,51 +23,22 @@ interface Photo {
 // Generate scattered photo positions
 const generatePhotos = (): Photo[] => {
   const photos: Photo[] = []
-  const desktopPositions = [
-    { x: 3, y: 6, w: 140, h: 175 },     // Col 1, Row 1 (0)
-    { x: 16, y: 14, w: 135, h: 165 },   // Col 2, Row 1 (1)
-    { x: 3, y: 38, w: 130, h: 160 },    // Col 1, Row 2 (2)
-    { x: 3, y: 70, w: 135, h: 165 },    // Col 1, Row 3 (3)
-    { x: 16, y: 46, w: 140, h: 175 },   // Col 2, Row 2 (4)
-    { x: 16, y: 76, w: 125, h: 155 },   // Col 2, Row 3 (5)
-    { x: 83, y: 6, w: 140, h: 175 },    // Col 4, Row 1 (6)
-    { x: 70, y: 14, w: 135, h: 165 },   // Col 3, Row 1 (7)
-    { x: 83, y: 38, w: 130, h: 160 },   // Col 4, Row 2 (8)
-    { x: 83, y: 70, w: 135, h: 165 },   // Col 4, Row 3 (9)
-    { x: 70, y: 46, w: 140, h: 175 },   // Col 3, Row 2 (10)
-    { x: 70, y: 76, w: 125, h: 155 },   // Col 3, Row 3 (11)
-  ]
-
-  const tabletPositions = [
-    { x: 4, y: 10, w: 130, h: 160 },    // Left Col 1, Row 1
-    { x: 18, y: 28, w: 125, h: 155 },   // Left Col 2, Row 1
-    { x: 4, y: 55, w: 130, h: 160 },    // Left Col 1, Row 2
-    { x: 18, y: 73, w: 130, h: 160 },   // Left Col 2, Row 2
-    { x: 82, y: 10, w: 130, h: 160 },   // Right Col 4, Row 1
-    { x: 68, y: 28, w: 125, h: 155 },   // Right Col 3, Row 1
-    { x: 82, y: 55, w: 130, h: 160 },   // Right Col 4, Row 2
-    { x: 68, y: 73, w: 130, h: 160 },   // Right Col 3, Row 2
-    // Fallbacks
-    { x: 4, y: 10, w: 130, h: 160 },
-    { x: 82, y: 10, w: 130, h: 160 },
-    { x: 4, y: 55, w: 130, h: 160 },
-    { x: 82, y: 55, w: 130, h: 160 },
-  ]
-
-  const mobilePositions = [
-    { x: 4, y: 15, w: 110, h: 135 },    // Left Col 1, Row 1
-    { x: 76, y: 15, w: 110, h: 135 },   // Right Col 2, Row 1
-    { x: 4, y: 60, w: 110, h: 135 },    // Left Col 1, Row 2
-    { x: 76, y: 60, w: 110, h: 135 },   // Right Col 2, Row 2
-    // Fallbacks
-    { x: 4, y: 15, w: 110, h: 135 },
-    { x: 76, y: 15, w: 110, h: 135 },
-    { x: 4, y: 60, w: 110, h: 135 },
-    { x: 76, y: 60, w: 110, h: 135 },
-    { x: 4, y: 15, w: 110, h: 135 },
-    { x: 76, y: 15, w: 110, h: 135 },
-    { x: 4, y: 60, w: 110, h: 135 },
-    { x: 76, y: 60, w: 110, h: 135 },
+  const collagePositions = [
+    // ROW 1
+    { x: 5, y: 5, w: 160, h: 200 },     // Photo 0
+    { x: 22, y: 8, w: 150, h: 190 },    // Photo 1
+    { x: 42, y: 4, w: 170, h: 210 },    // Photo 2
+    { x: 62, y: 8, w: 155, h: 195 },    // Photo 3
+    { x: 78, y: 5, w: 165, h: 205 },    // Photo 4
+    // ROW 2
+    { x: 8, y: 35, w: 170, h: 210 },    // Photo 5
+    { x: 28, y: 38, w: 160, h: 200 },   // Photo 6
+    { x: 52, y: 32, w: 180, h: 220 },   // Photo 7
+    { x: 72, y: 36, w: 160, h: 200 },   // Photo 8
+    // ROW 3
+    { x: 12, y: 65, w: 165, h: 205 },   // Photo 9
+    { x: 35, y: 68, w: 175, h: 215 },   // Photo 10
+    { x: 65, y: 62, w: 180, h: 220 },   // Photo 11
   ]
 
   const labels = [
@@ -81,15 +52,17 @@ const generatePhotos = (): Photo[] => {
       id: i,
       src: `/gallery/landing/photo${i}.jpg`,
       alt: label,
-      desktop: desktopPositions[i],
-      tablet: tabletPositions[i],
-      mobile: mobilePositions[i],
+      desktop: collagePositions[i],
+      tablet: collagePositions[i],
+      mobile: collagePositions[i],
       rotate: (Math.random() - 0.5) * 12,
       delay: Math.random() * 2,
     })
   })
 
-  return photos
+  // Randomly shuffle the photos to change the order every page refresh/reload
+  const shuffled = [...photos].sort(() => Math.random() - 0.5)
+  return shuffled
 }
 
 interface LandingHeroProps {
@@ -247,33 +220,30 @@ export default function LandingHero({ onEnter, onScrollDown, isMuted = false, on
       {/* Grunge overlay */}
       <div className="grunge-overlay" />
       
-      {/* Scattered Photos Centered Max-Width Container */}
-      <div className="absolute inset-y-0 left-1/2 -translate-x-1/2 w-full max-w-[1440px] pointer-events-none">
-        <div className="relative w-full h-full pointer-events-auto">
+      {/* Central Backing Collage Rectangle (z-20, strictly behind foreground z-40) */}
+      <div className="absolute inset-0 flex items-center justify-center z-20 pointer-events-none pt-24 pb-20">
+        <div 
+          className="relative w-[95%] max-w-5xl h-[65vh] border border-[#f5f5dc]/5 bg-black/15 backdrop-blur-[0.5px] pointer-events-auto overflow-y-auto scrollbar-none rounded-lg p-6 md:p-8 flex flex-wrap justify-center items-center gap-4 md:gap-6"
+        >
           {photos.map((photo) => {
-          // Responsive layout filtration to prevent mobile/tablet clutter
-          if (breakpoint === 'mobile' && photo.id >= 4) return null
-          if (breakpoint === 'tablet' && photo.id >= 8) return null
-
-          const pos = photo[breakpoint]
           const offset = photoOffsets[photo.id] || { x: 0, y: 0 }
+          const pos = photo[breakpoint]
           
           return (
             <div
               key={photo.id}
-              className={`gallery-photo float-photo photo-rgb transition-all ${
+              className={`gallery-photo float-photo photo-rgb transition-all flex-shrink-0 w-28 h-36 sm:w-36 sm:h-48 md:w-40 md:h-52 ${
                 isDragging && hoveredPhoto === photo.id ? '' : 'duration-700'
               } ${isReady ? 'opacity-100' : 'opacity-0'} ${
                 hoveredPhoto === photo.id ? 'cursor-grab active:cursor-grabbing' : 'cursor-pointer'
               }`}
               style={{
-                left: `calc(${pos.x}% - (${pos.w}px * var(--size-multiplier, 1) * ${pos.x} / 100))`,
-                top: `calc(${pos.y}% - (${pos.h}px * var(--size-multiplier, 1) * ${pos.y} / 100))`,
-                width: `clamp(${pos.w * 0.5}px, calc(${pos.w}px * var(--size-multiplier, 1)), ${pos.w * 1.1}px)`,
-                height: `clamp(${pos.h * 0.5}px, calc(${pos.h}px * var(--size-multiplier, 1)), ${pos.h * 1.1}px)`,
-                transform: `rotate(${photo.rotate}deg) scale(${hoveredPhoto === photo.id ? 1.1 : 1}) translate(${offset.x}px, ${offset.y}px)`,
+                transform: `rotate(${photo.rotate}deg) scale(${hoveredPhoto === photo.id ? 1.15 : 1}) translate(${offset.x}px, ${offset.y}px)`,
                 transitionDelay: isDragging ? '0s' : `${photo.delay * 0.3}s`,
-                zIndex: hoveredPhoto === photo.id ? 50 : photo.id,
+                zIndex: hoveredPhoto === photo.id ? 30 : photo.id,
+                opacity: hoveredPhoto === photo.id || isDragging ? 0.85 : 0.13,
+                transitionProperty: 'opacity, transform, z-index',
+                transitionDuration: '0.4s',
                 ['--float-delay' as string]: `${photo.delay}s`,
                 ['--rotate' as string]: `${photo.rotate}deg`,
               }}
