@@ -109,12 +109,12 @@ const teamMembers: TeamMember[] = [
     instagram: '#',
     linkedin: '#',
   },  {
-    name: 'ZOE WILLIAMS',
-    role: '// SYSTEMS ENGINEER',
-    image: 'https://picsum.photos/seed/team4/400/500?grayscale',
-    github: '#',
-    instagram: '#',
-    linkedin: '#',
+    name: 'AKSHANSH KUMMAR ',
+    role: 'TECHNICAL HEAD (ECE)',
+    image: '/gallery/heads/ak.jpg',
+    github: 'https://github.com/Akshanshk19',
+    instagram: undefined,
+    linkedin: 'https://www.linkedin.com/in/akshansh-kumar-262098258?utm_source=share_via&utm_content=profile&utm_medium=member_android',
   },  {
     name: 'ZOE WILLIAMS',
     role: '// SYSTEMS ENGINEER',
