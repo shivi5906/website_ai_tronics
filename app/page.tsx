@@ -78,16 +78,52 @@ export default function Home() {
     }
   }, [currentView])
 
+  // Listen for browser popstate (back/forward navigation)
+  useEffect(() => {
+    const handlePopState = (event: PopStateEvent) => {
+      if (event.state && event.state.view) {
+        setCurrentView(event.state.view as ViewState)
+      } else {
+        setCurrentView('landing')
+      }
+    }
+
+    window.addEventListener('popstate', handlePopState)
+
+    // Set initial history state to 'landing' if not set
+    if (!window.history.state || !window.history.state.view) {
+      window.history.replaceState({ view: 'landing' }, '')
+    }
+
+    return () => {
+      window.removeEventListener('popstate', handlePopState)
+    }
+  }, [])
+
+  // Helper to handle client-side view changes with history pushState
+  const navigateToView = (view: ViewState, push = true) => {
+    if (view !== currentView) {
+      setCurrentView(view)
+      if (push) {
+        window.history.pushState({ view }, '')
+      }
+    }
+  }
+
   const handleEnterSociety = () => {
-    setCurrentView('infinite-gallery')
+    navigateToView('infinite-gallery')
   }
 
   const handleSelectSection = (sectionId: string) => {
-    setCurrentView(sectionId as ViewState)
+    navigateToView(sectionId as ViewState)
   }
 
   const handleBackToMenu = () => {
-    setCurrentView('menu')
+    if (window.history.state && window.history.state.view) {
+      window.history.back()
+    } else {
+      navigateToView('menu')
+    }
   }
 
   const renderCurrentView = () => {
@@ -105,7 +141,7 @@ export default function Home() {
             >
               <LandingHero 
                 onEnter={handleEnterSociety} 
-                onScrollDown={() => setCurrentView('menu')} 
+                onScrollDown={() => navigateToView('menu')} 
                 isMuted={isMuted}
                 onToggleMute={() => setIsMuted(!isMuted)}
               />
@@ -121,7 +157,7 @@ export default function Home() {
             >
               <SectionMenu
                 isOpen={true}
-                onClose={() => setCurrentView('landing')}
+                onClose={() => navigateToView('landing')}
                 onSelectSection={handleSelectSection}
                 currentSection={null}
               />
@@ -129,21 +165,21 @@ export default function Home() {
           </div>
         )
       case 'team':
-        return <TeamSection onBack={handleBackToMenu} onHome={() => setCurrentView('landing')} />
+        return <TeamSection onBack={handleBackToMenu} onHome={() => navigateToView('landing')} />
       case 'about':
-        return <AboutSection onBack={handleBackToMenu} onHome={() => setCurrentView('landing')} />
+        return <AboutSection onBack={handleBackToMenu} onHome={() => navigateToView('landing')} />
       case 'events':
-        return <EventsSection onBack={handleBackToMenu} onHome={() => setCurrentView('landing')} />
+        return <EventsSection onBack={handleBackToMenu} onHome={() => navigateToView('landing')} />
       case 'vibe':
-        return <VibeSection onBack={handleBackToMenu} onHome={() => setCurrentView('landing')} />
+        return <VibeSection onBack={handleBackToMenu} onHome={() => navigateToView('landing')} />
       case 'contact':
-        return <ContactSection onBack={handleBackToMenu} onHome={() => setCurrentView('landing')} />
+        return <ContactSection onBack={handleBackToMenu} onHome={() => navigateToView('landing')} />
       case 'infinite-gallery':
         return (
           <InfiniteGallerySection 
             onBack={handleBackToMenu} 
             onNavigate={handleSelectSection} 
-            onHome={() => setCurrentView('landing')} 
+            onHome={() => navigateToView('landing')} 
             isMuted={isMuted}
             onToggleMute={() => setIsMuted(!isMuted)}
           />

@@ -204,7 +204,7 @@ export default function InfiniteGallerySection({
       <div className="fixed bottom-8 left-1/2 transform -translate-x-1/2 z-50">
         <button 
           onClick={handleBackToLanding}
-          className="gallery-exit-button flex items-center gap-2 cursor-none"
+          className="flex items-center gap-2 cursor-none bg-[#0a0a0a] border border-[#f5f5dc]/20 px-4 py-2 hover:bg-[#f5f5dc] hover:text-[#0a0a0a] hover:border-[#f5f5dc] text-[#f5f5dc] transition-all duration-300 shadow-lg shadow-black/40 hover:shadow-[#f5f5dc]/10 font-mono text-xs tracking-[0.2em] rounded-sm"
         >
           <X size={12} />
           RETURN TO HOME

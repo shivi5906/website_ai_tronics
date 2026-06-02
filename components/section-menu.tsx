@@ -189,14 +189,21 @@ export default function SectionMenu({ isOpen, onClose, onSelectSection, currentS
           </nav>
 
           {/* Footer info */}
-          <div className="mt-16 flex justify-between items-end">
-            <div className="font-mono text-[10px] text-[#6b6b6b] tracking-wider leading-relaxed">
+          <div className="mt-16 flex flex-col sm:flex-row justify-between items-center sm:items-end gap-6 sm:gap-0">
+            <div className="font-mono text-[10px] text-[#6b6b6b] tracking-wider leading-relaxed text-center sm:text-left">
               <p>AI-TRONICS HUB</p>
               <p>JIIT NOIDA</p>
               <p>EST. 2025</p>
             </div>
 
-            <div className="font-mono text-[10px] text-[#6b6b6b] tracking-wider text-right">
+            {/* Centered Credit Signature */}
+            <div className="text-center py-2 sm:py-0">
+              <p className="funky-credit text-[11px] md:text-[13px] uppercase tracking-[0.15em]">
+                // DESIGNED & ENGINEERED BY SHIVAM SHARMA ~ shivi
+              </p>
+            </div>
+
+            <div className="font-mono text-[10px] text-[#6b6b6b] tracking-wider text-center sm:text-right">
               <p>SELECT A SECTION</p>
               <p>TO EXPLORE</p>
             </div>
