@@ -124,7 +124,7 @@ export default function ContactSection({ onBack, onHome }: ContactSectionProps) 
               href="https://www.linkedin.com/company/ai-tronics/posts/?feedView=all" 
               target="_blank" 
               rel="noopener noreferrer"
-              className="group relative flex items-center justify-between p-6 border border-[#f5f5dc]/10 bg-black/40 hover:bg-black/60 hover:border-[#f5f5dc]/30 transition-all duration-300 hover:-translate-y-1 shadow-lg hover:shadow-[#00f0ff]/5 cursor-pointer"
+              className="group relative flex items-center justify-between p-6 border border-[#f5f5dc]/10 bg-black/40 hover:bg-black/60 hover:border-[#f5f5dc]/30 transition-all duration-300 hover:-translate-y-1 shadow-lg hover:shadow-[#00f0ff]/5 cursor-pointer w-full sm:col-span-2 sm:justify-self-center sm:w-[calc(50%-12px)]"
             >
               <div className="flex items-center gap-4">
                 <div className="p-3 bg-black/60 border border-[#f5f5dc]/10 group-hover:border-[#00f0ff]/40 text-[#a8a29e] group-hover:text-[#00f0ff] transition-colors rounded-md">
