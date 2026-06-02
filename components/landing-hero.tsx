@@ -355,11 +355,8 @@ export default function LandingHero({ onEnter, onScrollDown, isMuted = false, on
             onClick={onScrollDown}
             className="mt-16 opacity-50 cursor-pointer hover:opacity-100 hover:text-cream transition-all duration-300"
           >
-            <p className="font-mono text-[10px] text-[#6b6b6b] tracking-[0.2em] mb-2 uppercase">
+            <p className="font-mono text-[10px] text-[#6b6b6b] tracking-[0.2em] uppercase">
               Scroll or Click to Enter Menu
-            </p>
-            <p className="funky-credit text-[13px] uppercase tracking-[0.15em] mt-1">
-              // DESIGNED & ENGINEERED BY SHIVAM SHARMA ~ shivi
             </p>
           </div>
         </div>

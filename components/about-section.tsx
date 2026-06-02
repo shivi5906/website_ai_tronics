@@ -72,7 +72,7 @@ export default function AboutSection({ onBack, onHome }: AboutSectionProps) {
       {/* Back button */}
       <button
         onClick={onBack}
-        className="fixed top-8 left-8 z-50 font-mono text-xs text-[#a8a29e] hover:text-[#f5f5dc] tracking-[0.2em] transition-colors flex items-center gap-2"
+        className="fixed top-8 left-8 z-50 font-mono text-xs tracking-[0.2em] transition-all duration-300 flex items-center gap-2 bg-[#0a0a0a] border border-[#f5f5dc]/20 px-4 py-2 hover:bg-[#f5f5dc] hover:text-[#0a0a0a] hover:border-[#f5f5dc] text-[#f5f5dc] shadow-lg shadow-black/40 hover:shadow-[#f5f5dc]/10 rounded-sm"
       >
         <span className="text-lg">←</span> BACK
       </button>
