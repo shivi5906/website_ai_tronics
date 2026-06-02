@@ -88,8 +88,7 @@
   position: fixed;
   pointer-events: none;
   z-index: 99999;
-  transform: translate(-2px, -2px);
-  transition: transform 0.05s ease;
+  transform: translate3d(-100px, -100px, 0);
 }
 
 .custom-cursor svg {

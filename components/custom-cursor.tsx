@@ -9,10 +9,22 @@ export default function CustomCursor() {
     const cursorEl = cursorRef.current
     if (!cursorEl) return
 
-    const handleMouseMove = (e: MouseEvent) => {
-      // Direct DOM update using translate3d triggers GPU layer and avoids triggering reflows
-      cursorEl.style.transform = `translate3d(${e.clientX}px, ${e.clientY}px, 0)`
+    let animationFrameId: number | null = null
+    let latestX = -100
+    let latestY = -100
+
+    const applyPosition = () => {
+      cursorEl.style.transform = `translate3d(${latestX}px, ${latestY}px, 0)`
       cursorEl.style.opacity = '1'
+      animationFrameId = null
+    }
+
+    const handlePointerMove = (e: PointerEvent) => {
+      latestX = e.clientX
+      latestY = e.clientY
+      if (animationFrameId === null) {
+        animationFrameId = window.requestAnimationFrame(applyPosition)
+      }
     }
 
     const handleMouseLeave = () => {
@@ -22,7 +34,7 @@ export default function CustomCursor() {
       cursorEl.style.opacity = '1'
     }
 
-    window.addEventListener('mousemove', handleMouseMove)
+    window.addEventListener('pointermove', handlePointerMove, { passive: true })
     document.addEventListener('mouseleave', handleMouseLeave)
     document.addEventListener('mouseenter', handleMouseEnter)
 
@@ -31,9 +43,12 @@ export default function CustomCursor() {
     cursorEl.style.opacity = '0'
 
     return () => {
-      window.removeEventListener('mousemove', handleMouseMove)
+      window.removeEventListener('pointermove', handlePointerMove)
       document.removeEventListener('mouseleave', handleMouseLeave)
       document.removeEventListener('mouseenter', handleMouseEnter)
+      if (animationFrameId !== null) {
+        window.cancelAnimationFrame(animationFrameId)
+      }
     }
   }, [])
 
