@@ -42,7 +42,7 @@ const teamMembers: TeamMember[] = [
   {
     name: 'DR. JUHI GUPTA ',
     role: 'FACULTY COORDINATOR ',
-    image: '/gallery/heads/juhi123.jpg',
+    image: '/gallery/heads/juhi123.jpeg',
     github: undefined,
     instagram: undefined,
     linkedin: 'https://www.linkedin.com/in/dr-juhi-gupta-11b6601a/',
