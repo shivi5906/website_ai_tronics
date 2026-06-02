@@ -21,6 +21,11 @@ export default function Home() {
   // Default directly to local public asset path
   const [audioSrc, setAudioSrc] = useState('/audio/industry_baby.mp3')
   const audioRef = useRef<HTMLAudioElement | null>(null)
+  const isMutedRef = useRef(isMuted)
+
+  useEffect(() => {
+    isMutedRef.current = isMuted
+  }, [isMuted])
 
   // Sync mute/play states with the background audio element
   useEffect(() => {
@@ -42,6 +47,7 @@ export default function Home() {
     if (!isLoaded) return
 
     const playAudio = () => {
+      if (isMutedRef.current) return
       if (audioRef.current) {
         audioRef.current.play().catch(() => {
           // Autoplay blocked by browser policy
