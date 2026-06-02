@@ -48,7 +48,7 @@ const teamMembers: TeamMember[] = [
     linkedin: 'https://www.linkedin.com/in/dr-juhi-gupta-11b6601a/',
   },
   {
-    name: 'HIMANSHU CHAUDHARY',
+    name: 'DR. HIMANSHU CHAUDHARY',
     role: 'FACULTY COORDINATOR',
     image: '/gallery/heads/himanshu.jpg',
     github: undefined,
