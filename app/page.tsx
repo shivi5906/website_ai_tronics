@@ -21,6 +21,11 @@ export default function Home() {
   // Default directly to local public asset path
   const [audioSrc, setAudioSrc] = useState('/audio/industry_baby.mp3')
   const audioRef = useRef<HTMLAudioElement | null>(null)
+  const isMutedRef = useRef(isMuted)
+
+  useEffect(() => {
+    isMutedRef.current = isMuted
+  }, [isMuted])
 
   // Sync mute/play states with the background audio element
   useEffect(() => {
@@ -42,6 +47,7 @@ export default function Home() {
     if (!isLoaded) return
 
     const playAudio = () => {
+      if (isMutedRef.current) return
       if (audioRef.current) {
         audioRef.current.play().catch(() => {
           // Autoplay blocked by browser policy
@@ -189,6 +195,8 @@ export default function Home() {
     }
   }
 
+  const showGlobalSoundToggle = currentView !== 'landing' && currentView !== 'infinite-gallery'
+
   return (
     <>
       {/* Preloader */}
@@ -207,6 +215,26 @@ export default function Home() {
       <main className={`relative z-10 transition-opacity duration-1000 ${isLoaded ? 'opacity-100' : 'opacity-0'}`}>
         {renderCurrentView()}
       </main>
+
+      {/* Global Sound Toggle (bottom-right) */}
+      {showGlobalSoundToggle && (
+        <button
+          onClick={() => setIsMuted(!isMuted)}
+          className="fixed bottom-6 right-6 z-50 font-mono text-xs tracking-[0.2em] transition-all duration-300 flex items-center gap-2 cursor-pointer p-2 bg-transparent border border-[#f5f5dc]/10 text-[#a8a29e] hover:text-[#f5f5dc]"
+        >
+          {isMuted ? (
+            <>
+              <span className="w-1.5 h-1.5 bg-[#ff0040] rounded-full animate-ping" />
+              SOUND OFF
+            </>
+          ) : (
+            <>
+              <span className="w-1.5 h-1.5 bg-[#00ffff] rounded-full animate-pulse" />
+              SOUND ON
+            </>
+          )}
+        </button>
+      )}
 
       {/* Global Background Audio Player */}
       <audio 
